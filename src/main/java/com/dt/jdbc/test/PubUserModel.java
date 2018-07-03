@@ -3,6 +3,9 @@ package com.dt.jdbc.test;
 import com.dt.core.bean.*;
 import com.dt.core.norm.Model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
 public final class PubUserModel implements Model<PubUserModel, PubUserModel.Column, PubUserModel.On, PubUserModel.Where, PubUserModel.Sort, PubUserModel.Group> {
 
     public static final String tableName = "pub_user";
@@ -13,6 +16,15 @@ public final class PubUserModel implements Model<PubUserModel, PubUserModel.Colu
     public static final String id_alias = "id";
     public static final String loginName = "login_name";
     public static final String loginName_alias = "loginName";
+
+    public static final String[] columns = {id, loginName};
+    public static final String[] aliases = {id_alias, loginName_alias};
+    public static final Map<String, String> columnAliasMap = new LinkedHashMap<>();
+
+    static {
+        columnAliasMap.put(id, id_alias);
+        columnAliasMap.put(loginName, loginName_alias);
+    }
 
     public PubUserModel() {
     }
@@ -52,7 +64,7 @@ public final class PubUserModel implements Model<PubUserModel, PubUserModel.Colu
             return this;
         }
 
-        public Column loginName(String alias) {
+        public Column loginName() {
             this.columns.put(PubUserModel.loginName, loginName_alias);
             return this;
         }

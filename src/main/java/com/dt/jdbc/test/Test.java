@@ -1,7 +1,8 @@
 package com.dt.jdbc.test;
 
 import com.dt.core.engine.MySqlEngine;
-import com.dt.jdbc.core.JdbcEngine;
+import com.dt.jdbc.core.SpringJdbcEngine;
+import com.dt.jdbc.norm.JdbcEngine;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.thymeleaf.TemplateEngine;
@@ -12,7 +13,6 @@ import org.thymeleaf.templateresolver.StringTemplateResolver;
 
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -28,43 +28,43 @@ public class Test {
 
         DriverManagerDataSource driverManagerDataSource = new DriverManagerDataSource();
         driverManagerDataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        driverManagerDataSource.setUrl("jdbc:mysql://192.168.0.122:3306/null_logic");
+        driverManagerDataSource.setUrl("jdbc:mysql://192.168.3.3:3306/null_logic?useSSL=false");
         driverManagerDataSource.setUsername("root");
         driverManagerDataSource.setPassword("root");
 
         JdbcTemplate jdbcTemplate = new JdbcTemplate();
         jdbcTemplate.setDataSource(driverManagerDataSource);
 
-        JdbcEngine jdbcEngine = new JdbcEngine();
+        SpringJdbcEngine jdbcEngine = new SpringJdbcEngine();
         jdbcEngine.setJdbcTemplate(jdbcTemplate);
 
         for (int i = 0; i < 1; i++) {
             Long start = System.nanoTime();
 
-            /*Map<String, Object> record = jdbcEngine.queryByPrimaryKey(1, MySqlEngine.column(PubUserModel.class).column(table -> table));
+//            Map<String, Object> record = jdbcEngine.queryByPrimaryKey(1, MySqlEngine.column(PubUserModel.class).column(table -> table));
 
-            PubUser user = jdbcEngine.queryByPrimaryKey(1, PubUser.class, MySqlEngine.column(PubUserModel.class).column(PubUserModel.Column::id));
+//            PubUser user = jdbcEngine.queryByPrimaryKey(1, PubUser.class, MySqlEngine.column(PubUserModel.class).column(PubUserModel.Column::id));
 
-            List<Map<String, Object>> records = jdbcEngine.queryForList(MySqlEngine.main(PubUserModel.class)
+/*            List<Map<String, Object>> records = jdbcEngine.queryForList(MySqlEngine.main(PubUserModel.class)
                     .where((condition, mainTable) -> condition
                             .and(mainTable.id().between(1, 2))
                             .or(mainTable.loginName().equalTo(3)))
-                    .where((condition, mainTable) -> condition));
+                    .where((condition, mainTable) -> condition));*/
 
-            List<PubUser> userList = jdbcEngine.queryForList(PubUser.class, MySqlEngine.main(PubUserModel.class)
+/*            List<PubUser> userList = jdbcEngine.queryForList(PubUser.class, MySqlEngine.main(PubUserModel.class)
                     .where((condition, mainTable) -> condition
                             .and(mainTable.id().between(1, 2))
                             .or(mainTable.loginName().equalTo(3)))
-                    .where((condition, mainTable) -> condition));
+                    .where((condition, mainTable) -> condition));*/
 
-            Map<String, Object> one = jdbcEngine.queryOne(MySqlEngine.main(PubUserModel.class).limit(10, 1));
+//            Map<String, Object> one = jdbcEngine.queryOne(MySqlEngine.main(PubUserModel.class).limit(10, 1));
 
-            PubUser oneUser = jdbcEngine.queryOne(PubUser.class, MySqlEngine.main(PubUserModel.class).limit(100, 1));
+//            PubUser oneUser = jdbcEngine.queryOne(PubUser.class, MySqlEngine.main(PubUserModel.class).limit(100, 1));
 
-            int count = jdbcEngine.queryCount(MySqlEngine.main(PubUserModel.class)
+/*            int count = jdbcEngine.queryCount(MySqlEngine.main(PubUserModel.class)
                     .group(PubUserModel.Group::id));*/
 
-            jdbcEngine.queryPairColumnInMap(MySqlEngine.main(PubUserModel.class));
+            Map<String, Object> result = jdbcEngine.queryPairColumnInMap(MySqlEngine.main(PubUserModel.class).column(table -> table.id().loginName()));
 
             Long end = (System.nanoTime() - start);
             System.out.println("耗时:" + end + " => " + end / 1000000);

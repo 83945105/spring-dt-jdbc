@@ -46,6 +46,9 @@
         <spring-dt-core.version>0.0.1-SNAPSHOT</spring-dt-core.version>
         <thymeleaf.version>3.0.9.RELEASE</thymeleaf.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <spring.version>5.0.4.RELEASE</spring.version>
+        <druid.version>1.1.8</druid.version>
+        <mysql-connector-java.version>5.1.45</mysql-connector-java.version>
     </properties>
 
     <dependencies>
@@ -63,6 +66,21 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-nop</artifactId>
             <version>${slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+            <version>${spring.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>druid</artifactId>
+            <version>${druid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>${mysql-connector-java.version}</version>
         </dependency>
     </dependencies>
 

@@ -167,7 +167,7 @@ public class Test {
     public void method5() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://192.168.0.112:3306/shiro-manager-spring?useSSL=false");
+        dataSource.setUrl("jdbc:mysql://192.168.3.3:3306/shiro-manager-spring?useSSL=false");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
 
@@ -178,9 +178,13 @@ public class Test {
         engine.setJdbcTemplate(jdbcTemplate);
 
         JurRole record = new JurRole();
-        record.setId("2048");
+        record.setId("1024");
         record.setDescription("64646");
         record.setParentId("233");
+        JurRole record2 = new JurRole();
+        record2.setId("2048");
+        record2.setDescription("64646");
+        record2.setParentId("233");
 
         int count = 1;
         long tt = 0;
@@ -199,6 +203,24 @@ public class Test {
 //            engine.updateRecordByPrimaryKeySelective("1024", record, JurRoleModel.class);
 
 //            engine.updateOrInsertRecord(new Object[]{record}, MySqlEngine.column(JurRoleModel.class).column(table -> table.id().parentId()));
+
+//            engine.batchUpdateRecordsByPrimaryKeys(JurRoleModel.class, record, record2, record2, record2, record2, record2, record2, record2, record2, record2);
+
+/*            engine.batchUpdateRecordsByPrimaryKeys(new Object[]{record, record2}, MySqlEngine.main(JurRoleModel.class)
+                    .innerJoin(JurRoleUserModel.class, (on, joinTable, mainTable) -> on
+                            .and(joinTable.roleId().equalTo(mainTable.id())))
+                    .column(table -> table.createTime())
+                    .where((condition, mainTable) -> condition.and(mainTable.deleteTime().equalTo("4646"))));*/
+
+//            engine.deleteByPrimaryKey("666", JurRoleModel.class);
+
+//            engine.batchDeleteByPrimaryKeys(JurRoleModel.class, "666", "777");
+
+            engine.delete(MySqlEngine.main(JurRoleModel.class)
+                    .innerJoin(JurRoleUserModel.class, (on, joinTable, mainTable) -> on
+                            .and(joinTable.roleId().equalTo(mainTable.id())))
+                    .where((condition, mainTable) -> condition
+                            .and(mainTable.deleteTime().equalTo("64646464"))));
 
             long end = System.nanoTime() - start;
             System.out.println(end + " - " + end / 1000000);

@@ -10,7 +10,10 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by 白超 on 2018/7/3.
+ * jdbc 增删改查接口
+ * 提供总计多达100+种方法
+ *
+ * @author 白超
  */
 public interface JdbcEngine {
 
@@ -345,29 +348,29 @@ public interface JdbcEngine {
 
     int updateRecordSelective(Object record, WhereEngine whereEngine);
 
-    default <T extends Model> int batchUpdateRecords(Class<T> modelClass, Object... records) {
-        return this.batchUpdateRecords(records, modelClass);
+    default <T extends Model> int batchUpdateRecordsByPrimaryKeys(Class<T> modelClass, Object... records) {
+        return this.batchUpdateRecordsByPrimaryKeys(records, modelClass);
     }
 
-    default <T extends Model> int batchUpdateRecords(String tableName, Class<T> modelClass, Object... records) {
-        return this.batchUpdateRecords(records, tableName, modelClass);
+    default <T extends Model> int batchUpdateRecordsByPrimaryKeys(String tableName, Class<T> modelClass, Object... records) {
+        return this.batchUpdateRecordsByPrimaryKeys(records, tableName, modelClass);
     }
 
-    <T extends Model> int batchUpdateRecords(Object[] records, Class<T> modelClass);
+    <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, Class<T> modelClass);
 
-    <T extends Model> int batchUpdateRecords(Object[] records, String tableName, Class<T> modelClass);
+    <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, String tableName, Class<T> modelClass);
 
-    <T extends Model> int batchUpdateRecords(Collection<?> records, Class<T> modelClass);
+    <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, Class<T> modelClass);
 
-    <T extends Model> int batchUpdateRecords(Collection<?> records, String tableName, Class<T> modelClass);
+    <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, String tableName, Class<T> modelClass);
 
-    default int batchUpdateRecords(WhereEngine whereEngine, Object... records) {
-        return this.batchUpdateRecords(records, whereEngine);
+    default int batchUpdateRecordsByPrimaryKeys(WhereEngine whereEngine, Object... records) {
+        return this.batchUpdateRecordsByPrimaryKeys(records, whereEngine);
     }
 
-    int batchUpdateRecords(Object[] records, WhereEngine whereEngine);
+    int batchUpdateRecordsByPrimaryKeys(Object[] records, WhereEngine whereEngine);
 
-    int batchUpdateRecords(Collection<?> records, WhereEngine whereEngine);
+    int batchUpdateRecordsByPrimaryKeys(Collection<?> records, WhereEngine whereEngine);
 
     default <T extends Model> int updateOrInsertArgs(Class<T> modelClass, Object... batchArgs) {
         return this.updateOrInsertArgs(batchArgs, modelClass);
@@ -416,5 +419,27 @@ public interface JdbcEngine {
     int updateOrInsertRecord(Object[] records, ColumnEngine columnEngine);
 
     int updateOrInsertRecord(Collection<?> records, ColumnEngine columnEngine);
+
+    <T extends Model> int deleteByPrimaryKey(Object keyValue, Class<T> modelClass);
+
+    <T extends Model> int deleteByPrimaryKey(Object keyValue, String tableName, Class<T> modelClass);
+
+    default <T extends Model> int batchDeleteByPrimaryKeys(Class<T> modelClass, Object... keyValues) {
+        return this.batchDeleteByPrimaryKeys(keyValues, modelClass);
+    }
+
+    default <T extends Model> int batchDeleteByPrimaryKeys(String tableName, Class<T> modelClass, Object... keyValues) {
+        return this.batchDeleteByPrimaryKeys(keyValues, tableName, modelClass);
+    }
+
+    <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, Class<T> modelClass);
+
+    <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, String tableName, Class<T> modelClass);
+
+    <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, Class<T> modelClass);
+
+    <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, String tableName, Class<T> modelClass);
+
+    int delete(WhereEngine whereEngine);
 
 }

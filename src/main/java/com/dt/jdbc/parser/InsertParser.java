@@ -23,11 +23,10 @@ public class InsertParser {
                 .append(" (");
         int i = 0;
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
+            sql.append("`").append(entry.getKey()).append("`");
         }
         sql.append(") values (");
         for (; i > 0; i--) {
@@ -49,11 +48,10 @@ public class InsertParser {
                 .append(" (");
         int i = 0;
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
+            sql.append("`").append(entry.getKey()).append("`");
             args.add(record.get(entry.getKey()));
         }
         sql.append(") values (");
@@ -83,11 +81,10 @@ public class InsertParser {
             if (value == null) {
                 continue;
             }
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
+            sql.append("`").append(entry.getKey()).append("`");
             args.add(value);
         }
         sql.append(") values (");
@@ -114,11 +111,10 @@ public class InsertParser {
                 .append(" (");
         int i = 0;
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
+            sql.append("`").append(entry.getKey()).append("`");
             //暂不支持Boolean类型获取Get方法
             args.add(methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
         }
@@ -152,11 +148,10 @@ public class InsertParser {
             if (value == null) {
                 continue;
             }
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
+            sql.append("`").append(entry.getKey()).append("`");
             args.add(value);
         }
         sql.append(") values (");
@@ -179,11 +174,10 @@ public class InsertParser {
                 .append(" (");
         int i = 0;
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
+            sql.append("`").append(entry.getKey()).append("`");
         }
         sql.append(") values ");
         StringBuilder values = new StringBuilder(32).append("(");
@@ -204,6 +198,7 @@ public class InsertParser {
         return sql.toString();
     }
 
+    @SuppressWarnings("unused")
     public void setCache(ClassMethodAccessCache cache) {
         this.cache = cache;
     }

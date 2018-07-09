@@ -15,13 +15,12 @@ public class UpdateOrInsertParser {
         int i = 0;
         StringBuilder on = new StringBuilder(64);
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-                on.append("`").append(entry.getKey()).append("` = values(`").append(entry.getKey()).append("`)");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
-                on.append(",`").append(entry.getKey()).append("` = values(`").append(entry.getKey()).append("`)");
+            if (i++ != 0) {
+                sql.append(",");
+                on.append(",");
             }
+            sql.append("`").append(entry.getKey()).append("`");
+            on.append("`").append(entry.getKey()).append("` = values(`").append(entry.getKey()).append("`)");
         }
         sql.append(") values ");
         StringBuilder values = new StringBuilder(32).append("(");

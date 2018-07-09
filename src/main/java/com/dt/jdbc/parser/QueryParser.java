@@ -13,18 +13,17 @@ import java.util.List;
 public class QueryParser {
 
     public String selectByPrimaryKey(ColumnEngine columnEngine) {
-        return new StringBuilder(36)
-                .append("select ")
-                .append(columnEngine.getColumnSql())
-                .append(" from ")
-                .append(columnEngine.getTableName())
-                .append(" ")
-                .append(columnEngine.getTableAlias())
-                .append(" where ")
-                .append(columnEngine.getTableAlias())
-                .append(".")
-                .append(columnEngine.getPrimaryKeyName())
-                .append(" = ?").toString();
+        return "select " +
+                columnEngine.getColumnSql() +
+                " from " +
+                columnEngine.getTableName() +
+                " " +
+                columnEngine.getTableAlias() +
+                " where " +
+                columnEngine.getTableAlias() +
+                "." +
+                columnEngine.getPrimaryKeyName() +
+                " = ?";
     }
 
     public ParseData selectList(Engine engine) {
@@ -49,11 +48,11 @@ public class QueryParser {
             args.addAll(parseData.getArgs());
         }
         str = engine.getGroupSql();
-        if (str != null && str.trim() != "") {
+        if (str != null && str.trim().length() != 0) {
             sql.append(" ").append(str);
         }
         str = engine.getSortSql();
-        if (str != null && str.trim() != "") {
+        if (str != null && str.trim().length() != 0) {
             sql.append(" ").append(str);
         }
         parseData = engine.getLimitParseData();
@@ -72,7 +71,7 @@ public class QueryParser {
         ParseData parseData;
         List<Object> args = new ArrayList<>();
         String str = engine.getGroupSql();
-        boolean hasGroup = str != null && str.trim() != "";
+        boolean hasGroup = str != null && str.trim().length() != 0;
         if (hasGroup) {
             sql.append("select count(1) from (select ")
                     .append(engine.getTableAlias())

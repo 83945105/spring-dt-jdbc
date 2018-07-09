@@ -4,10 +4,7 @@ import com.dt.core.data.ParseData;
 import com.dt.core.engine.*;
 import com.dt.core.norm.Engine;
 import com.dt.core.norm.Model;
-import com.dt.jdbc.parser.InsertParser;
-import com.dt.jdbc.parser.QueryParser;
-import com.dt.jdbc.parser.UpdateOrInsertParser;
-import com.dt.jdbc.parser.UpdateParser;
+import com.dt.jdbc.parser.*;
 import com.dt.jdbc.plugins.*;
 import com.dt.jdbc.norm.JdbcEngine;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +21,7 @@ import java.util.Map;
 public class SpringJdbcEngine implements JdbcEngine {
 
     @Autowired
+    @SuppressWarnings("all")
     private JdbcTemplate jdbcTemplate;
 
     private QueryParser queryParser = new QueryParser();
@@ -33,6 +31,8 @@ public class SpringJdbcEngine implements JdbcEngine {
     private UpdateParser updateParser = new UpdateParser();
 
     private UpdateOrInsertParser updateOrInsertParser = new UpdateOrInsertParser();
+
+    private DeleteParser deleteParser = new DeleteParser();
 
     @Override
     public Map<String, Object> queryByPrimaryKey(Object keyValue, ColumnEngine columnEngine) {
@@ -581,33 +581,51 @@ public class SpringJdbcEngine implements JdbcEngine {
     }
 
     @Override
-    public <T extends Model> int batchUpdateRecords(Object[] records, Class<T> modelClass) {
-        return 0;
+    @SuppressWarnings("unchecked")
+    public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(model.getTableName(),
+                model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
+        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
     }
 
     @Override
-    public <T extends Model> int batchUpdateRecords(Object[] records, String tableName, Class<T> modelClass) {
-        return 0;
+    @SuppressWarnings("unchecked")
+    public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, String tableName, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(tableName,
+                model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
+        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
     }
 
     @Override
-    public <T extends Model> int batchUpdateRecords(Collection<?> records, Class<T> modelClass) {
-        return 0;
+    @SuppressWarnings("unchecked")
+    public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(model.getTableName(),
+                model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
+        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
     }
 
     @Override
-    public <T extends Model> int batchUpdateRecords(Collection<?> records, String tableName, Class<T> modelClass) {
-        return 0;
+    @SuppressWarnings("unchecked")
+    public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, String tableName, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(tableName,
+                model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
+        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
     }
 
     @Override
-    public int batchUpdateRecords(Object[] records, WhereEngine whereEngine) {
-        return 0;
+    public int batchUpdateRecordsByPrimaryKeys(Object[] records, WhereEngine whereEngine) {
+        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(records, whereEngine);
+        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
     }
 
     @Override
-    public int batchUpdateRecords(Collection<?> records, WhereEngine whereEngine) {
-        return 0;
+    public int batchUpdateRecordsByPrimaryKeys(Collection<?> records, WhereEngine whereEngine) {
+        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(records, whereEngine);
+        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
     }
 
     @Override
@@ -724,6 +742,55 @@ public class SpringJdbcEngine implements JdbcEngine {
         }
         String sql = this.updateOrInsertParser.updateOrInsert(columnEngine.getTableName(), columnAliasMap, records.size());
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
+    }
+
+    @Override
+    public <T extends Model> int deleteByPrimaryKey(Object keyValue, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        String sql = this.deleteParser.deleteByPrimaryKey(model.getTableName(), model.getPrimaryKeyName());
+        return this.jdbcTemplate.update(sql, keyValue);
+    }
+
+    @Override
+    public <T extends Model> int deleteByPrimaryKey(Object keyValue, String tableName, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        String sql = this.deleteParser.deleteByPrimaryKey(tableName, model.getPrimaryKeyName());
+        return this.jdbcTemplate.update(sql, keyValue);
+    }
+
+    @Override
+    public <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        String sql = this.deleteParser.batchDeleteByPrimaryKeys(model.getTableName(), model.getPrimaryKeyName(), keyValues.length);
+        return this.jdbcTemplate.update(sql, keyValues);
+    }
+
+    @Override
+    public <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, String tableName, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        String sql = this.deleteParser.batchDeleteByPrimaryKeys(tableName, model.getPrimaryKeyName(), keyValues.length);
+        return this.jdbcTemplate.update(sql, keyValues);
+    }
+
+    @Override
+    public <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        String sql = this.deleteParser.batchDeleteByPrimaryKeys(model.getTableName(), model.getPrimaryKeyName(), keyValues.size());
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(keyValues));
+    }
+
+    @Override
+    public <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, String tableName, Class<T> modelClass) {
+        Model model = newModel(modelClass);
+        String sql = this.deleteParser.batchDeleteByPrimaryKeys(tableName, model.getPrimaryKeyName(), keyValues.size());
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(keyValues));
+    }
+
+    @Override
+    public int delete(WhereEngine whereEngine) {
+        ParseData parseData = this.deleteParser.delete(whereEngine);
+        System.out.println(parseData.getSql());
+        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
     }
 
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {

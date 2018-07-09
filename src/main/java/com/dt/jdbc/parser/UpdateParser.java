@@ -7,6 +7,7 @@ import com.dt.core.engine.WhereEngine;
 import com.esotericsoftware.reflectasm.MethodAccess;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -27,12 +28,10 @@ public class UpdateParser {
             if (entry.getKey().equals(primaryKeyName)) {
                 continue;
             }
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append("`").append(entry.getKey()).append("`").append(" = ?");
         }
         return sql.append(" where ").append(primaryKeyName).append(" = ?").toString();
     }
@@ -46,12 +45,10 @@ public class UpdateParser {
                 .append(" set ");
         int i = 0;
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append("`").append(entry.getKey()).append("`").append(" = ?");
             args.add(record.get(entry.getKey()));
         }
         args.add(primaryKeyValue);
@@ -74,12 +71,10 @@ public class UpdateParser {
             if (value == null) {
                 continue;
             }
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append("`").append(entry.getKey()).append("`").append(" = ?");
             args.add(value);
         }
         args.add(primaryKeyValue);
@@ -99,12 +94,10 @@ public class UpdateParser {
                 .append(" set ");
         int i = 0;
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append("`").append(entry.getKey()).append("`").append(" = ?");
             //暂不支持Boolean类型获取Get方法
             args.add(methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
         }
@@ -131,12 +124,10 @@ public class UpdateParser {
             if (value == null) {
                 continue;
             }
-            if (i++ == 0) {
-                sql.append("`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append("`").append(entry.getKey()).append("`").append(" = ?");
             args.add(value);
         }
         args.add(primaryKeyValue);
@@ -168,12 +159,10 @@ public class UpdateParser {
             columnAliasMap = whereEngine.getTable().getColumnAliasMap();
         }
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append(tableAlias).append(".`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",").append(tableAlias).append(".`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append(tableAlias).append(".`").append(entry.getKey()).append("`").append(" = ?");
             args.add(record.get(entry.getKey()));
         }
         parseData = whereEngine.getWhereParseData();
@@ -212,12 +201,10 @@ public class UpdateParser {
             columnAliasMap = whereEngine.getTable().getColumnAliasMap();
         }
         for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
-            if (i++ == 0) {
-                sql.append(tableAlias).append(".`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",").append(tableAlias).append(".`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append(tableAlias).append(".`").append(entry.getKey()).append("`").append(" = ?");
             //暂不支持Boolean类型获取Get方法
             args.add(methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
         }
@@ -260,12 +247,10 @@ public class UpdateParser {
             if (value == null) {
                 continue;
             }
-            if (i++ == 0) {
-                sql.append(tableAlias).append(".`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",").append(tableAlias).append(".`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
-            sql.append(" = ?");
+            sql.append(tableAlias).append(".`").append(entry.getKey()).append("`").append(" = ?");
             args.add(value);
         }
         parseData = whereEngine.getWhereParseData();
@@ -310,11 +295,10 @@ public class UpdateParser {
             if (value == null) {
                 continue;
             }
-            if (i++ == 0) {
-                sql.append(tableAlias).append(".`").append(entry.getKey()).append("`");
-            } else {
-                sql.append(",").append(tableAlias).append(".`").append(entry.getKey()).append("`");
+            if (i++ != 0) {
+                sql.append(",");
             }
+            sql.append(tableAlias).append(".`").append(entry.getKey()).append("`");
             sql.append(" = ?");
             args.add(value);
         }
@@ -329,31 +313,327 @@ public class UpdateParser {
         return parseData;
     }
 
-    public String batchUpdateByPrimaryKeys(String tableName, String primaryKeyName, String primaryKeyAlias, Map<String, String> columnAliasMap, Object[] records) {
+    public ParseData batchUpdateByPrimaryKeys(String tableName, String primaryKeyName, String primaryKeyAlias, Map<String, String> columnAliasMap, Object[] records) {
         MethodAccess methodAccess;
         StringBuilder sql = new StringBuilder(128);
-        ParseData parseData = new ParseData();
         List<Object> args = new ArrayList<>();
         sql.append("update ")
                 .append(tableName)
                 .append(" set ");
 
         StringBuilder when = new StringBuilder(64);
+        StringBuilder in = new StringBuilder(32);
+        List<Object> inArgs = new ArrayList<>();
         Object keyValue;
+        int i = 0;
         for (Object record : records) {
             if (record instanceof Map) {
                 keyValue = ((Map) record).get(primaryKeyName);
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(((Map) record).get(entry.getKey()));
+                }
             } else {
                 Class clazz = record.getClass();
                 methodAccess = this.cache.getMethodAccess(clazz);
                 keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
+                }
             }
+            when.append("when '").append(keyValue).append("' then ? ");
         }
-
-
-        return null;
+        i = 0;
+        for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+            if (entry.getKey().equals(primaryKeyName)) {
+                continue;
+            }
+            if (i++ != 0) {
+                sql.append(",");
+            }
+            sql.append("`")
+                    .append(entry.getKey())
+                    .append("`=case `")
+                    .append(primaryKeyName)
+                    .append("` ")
+                    .append(when)
+                    .append(" end");
+        }
+        sql.append(" where `").append(primaryKeyName).append("` in (").append(in).append(")");
+        args.addAll(inArgs);
+        ParseData parseData = new ParseData();
+        parseData.setSql(sql.toString());
+        parseData.setArgs(args);
+        return parseData;
     }
 
+    public ParseData batchUpdateByPrimaryKeys(String tableName, String primaryKeyName, String primaryKeyAlias, Map<String, String> columnAliasMap, Collection<?> records) {
+        MethodAccess methodAccess;
+        StringBuilder sql = new StringBuilder(128);
+        List<Object> args = new ArrayList<>();
+        sql.append("update ")
+                .append(tableName)
+                .append(" set ");
+
+        StringBuilder when = new StringBuilder(64);
+        StringBuilder in = new StringBuilder(32);
+        List<Object> inArgs = new ArrayList<>();
+        Object keyValue;
+        int i = 0;
+        for (Object record : records) {
+            if (record instanceof Map) {
+                keyValue = ((Map) record).get(primaryKeyName);
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(((Map) record).get(entry.getKey()));
+                }
+            } else {
+                Class clazz = record.getClass();
+                methodAccess = this.cache.getMethodAccess(clazz);
+                keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
+                }
+            }
+            when.append("when '").append(keyValue).append("' then ? ");
+        }
+        i = 0;
+        for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+            if (entry.getKey().equals(primaryKeyName)) {
+                continue;
+            }
+            if (i++ != 0) {
+                sql.append(",");
+            }
+            sql.append("`")
+                    .append(entry.getKey())
+                    .append("`=case `")
+                    .append(primaryKeyName)
+                    .append("` ")
+                    .append(when)
+                    .append(" end");
+        }
+        sql.append(" where `").append(primaryKeyName).append("` in (").append(in).append(")");
+        args.addAll(inArgs);
+        ParseData parseData = new ParseData();
+        parseData.setSql(sql.toString());
+        parseData.setArgs(args);
+        return parseData;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ParseData batchUpdateByPrimaryKeys(Object[] records, WhereEngine whereEngine) {
+        ParseData parseData;
+        String tableName = whereEngine.getTableName();
+        String tableAlias = whereEngine.getTableAlias();
+        String primaryKeyName = whereEngine.getPrimaryKeyName();
+        String primaryKeyAlias = whereEngine.getPrimaryKeyAlias();
+        Map<String, String> columnAliasMap = whereEngine.getColumnAliasMap();
+        if (columnAliasMap.size() == 0) {
+            columnAliasMap = whereEngine.getTable().getColumnAliasMap();
+        }
+        MethodAccess methodAccess;
+        StringBuilder sql = new StringBuilder(128);
+        List<Object> args = new ArrayList<>();
+        sql.append("update ")
+                .append(tableName).append(" ").append(tableAlias);
+        parseData = whereEngine.getJoinParseData();
+        if (parseData != null && parseData.getSql() != null) {
+            sql.append(" ").append(parseData.getSql());
+            args.addAll(parseData.getArgs());
+        }
+        sql.append(" set ");
+        StringBuilder when = new StringBuilder(64);
+        StringBuilder in = new StringBuilder(32);
+        List<Object> inArgs = new ArrayList<>();
+        Object keyValue;
+        int i = 0;
+        for (Object record : records) {
+            if (record instanceof Map) {
+                keyValue = ((Map) record).get(primaryKeyName);
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(((Map) record).get(entry.getKey()));
+                }
+            } else {
+                Class clazz = record.getClass();
+                methodAccess = this.cache.getMethodAccess(clazz);
+                keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
+                }
+            }
+            when.append("when '").append(keyValue).append("' then ? ");
+        }
+        i = 0;
+        for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+            if (entry.getKey().equals(primaryKeyName)) {
+                continue;
+            }
+            if (i++ != 0) {
+                sql.append(",");
+            }
+            sql.append(tableAlias)
+                    .append(".`")
+                    .append(entry.getKey())
+                    .append("`=case ")
+                    .append(tableAlias)
+                    .append(".`")
+                    .append(primaryKeyName)
+                    .append("` ")
+                    .append(when)
+                    .append(" end");
+        }
+        sql.append(" where ").append(tableAlias).append(".`").append(primaryKeyName).append("` in (").append(in).append(")");
+        args.addAll(inArgs);
+        parseData = whereEngine.getWhereParseData();
+        if (parseData != null && parseData.getSql() != null) {
+            sql.append(" and ").append(parseData.getSql());
+            args.addAll(parseData.getArgs());
+        }
+        parseData = new ParseData();
+        parseData.setSql(sql.toString());
+        parseData.setArgs(args);
+        return parseData;
+    }
+
+    @SuppressWarnings("unchecked")
+    public ParseData batchUpdateByPrimaryKeys(Collection<?> records, WhereEngine whereEngine) {
+        ParseData parseData;
+        String tableName = whereEngine.getTableName();
+        String tableAlias = whereEngine.getTableAlias();
+        String primaryKeyName = whereEngine.getPrimaryKeyName();
+        String primaryKeyAlias = whereEngine.getPrimaryKeyAlias();
+        Map<String, String> columnAliasMap = whereEngine.getColumnAliasMap();
+        if (columnAliasMap.size() == 0) {
+            columnAliasMap = whereEngine.getTable().getColumnAliasMap();
+        }
+        MethodAccess methodAccess;
+        StringBuilder sql = new StringBuilder(128);
+        List<Object> args = new ArrayList<>();
+        sql.append("update ")
+                .append(tableName).append(" ").append(tableAlias);
+        parseData = whereEngine.getJoinParseData();
+        if (parseData != null && parseData.getSql() != null) {
+            sql.append(" ").append(parseData.getSql());
+            args.addAll(parseData.getArgs());
+        }
+        sql.append(" set ");
+        StringBuilder when = new StringBuilder(64);
+        StringBuilder in = new StringBuilder(32);
+        List<Object> inArgs = new ArrayList<>();
+        Object keyValue;
+        int i = 0;
+        for (Object record : records) {
+            if (record instanceof Map) {
+                keyValue = ((Map) record).get(primaryKeyName);
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(((Map) record).get(entry.getKey()));
+                }
+            } else {
+                Class clazz = record.getClass();
+                methodAccess = this.cache.getMethodAccess(clazz);
+                keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
+                if (i++ != 0) {
+                    in.append(",");
+                }
+                in.append("?");
+                inArgs.add(keyValue);
+                for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+                    if (entry.getKey().equals(primaryKeyName)) {
+                        continue;
+                    }
+                    args.add(methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
+                }
+            }
+            when.append("when '").append(keyValue).append("' then ? ");
+        }
+        i = 0;
+        for (Map.Entry<String, String> entry : columnAliasMap.entrySet()) {
+            if (entry.getKey().equals(primaryKeyName)) {
+                continue;
+            }
+            if (i++ != 0) {
+                sql.append(",");
+            }
+            sql.append(tableAlias)
+                    .append(".`")
+                    .append(entry.getKey())
+                    .append("`=case ")
+                    .append(tableAlias)
+                    .append(".`")
+                    .append(primaryKeyName)
+                    .append("` ")
+                    .append(when)
+                    .append(" end");
+        }
+        sql.append(" where ").append(tableAlias).append(".`").append(primaryKeyName).append("` in (").append(in).append(")");
+        args.addAll(inArgs);
+        parseData = whereEngine.getWhereParseData();
+        if (parseData != null && parseData.getSql() != null) {
+            sql.append(" and ").append(parseData.getSql());
+            args.addAll(parseData.getArgs());
+        }
+        parseData = new ParseData();
+        parseData.setSql(sql.toString());
+        parseData.setArgs(args);
+        return parseData;
+    }
+
+    @SuppressWarnings("unused")
     public void setCache(ClassMethodAccessCache cache) {
         this.cache = cache;
     }

@@ -345,4 +345,76 @@ public interface JdbcEngine {
 
     int updateRecordSelective(Object record, WhereEngine whereEngine);
 
+    default <T extends Model> int batchUpdateRecords(Class<T> modelClass, Object... records) {
+        return this.batchUpdateRecords(records, modelClass);
+    }
+
+    default <T extends Model> int batchUpdateRecords(String tableName, Class<T> modelClass, Object... records) {
+        return this.batchUpdateRecords(records, tableName, modelClass);
+    }
+
+    <T extends Model> int batchUpdateRecords(Object[] records, Class<T> modelClass);
+
+    <T extends Model> int batchUpdateRecords(Object[] records, String tableName, Class<T> modelClass);
+
+    <T extends Model> int batchUpdateRecords(Collection<?> records, Class<T> modelClass);
+
+    <T extends Model> int batchUpdateRecords(Collection<?> records, String tableName, Class<T> modelClass);
+
+    default int batchUpdateRecords(WhereEngine whereEngine, Object... records) {
+        return this.batchUpdateRecords(records, whereEngine);
+    }
+
+    int batchUpdateRecords(Object[] records, WhereEngine whereEngine);
+
+    int batchUpdateRecords(Collection<?> records, WhereEngine whereEngine);
+
+    default <T extends Model> int updateOrInsertArgs(Class<T> modelClass, Object... batchArgs) {
+        return this.updateOrInsertArgs(batchArgs, modelClass);
+    }
+
+    default <T extends Model> int updateOrInsertArgs(String tableName, Class<T> modelClass, Object... batchArgs) {
+        return this.updateOrInsertArgs(batchArgs, tableName, modelClass);
+    }
+
+    <T extends Model> int updateOrInsertArgs(Object[] batchArgs, Class<T> modelClass);
+
+    <T extends Model> int updateOrInsertArgs(Object[] batchArgs, String tableName, Class<T> modelClass);
+
+    <T extends Model> int updateOrInsertArgs(Collection<?> batchArgs, Class<T> modelClass);
+
+    <T extends Model> int updateOrInsertArgs(Collection<?> batchArgs, String tableName, Class<T> modelClass);
+
+    default int updateOrInsertArgs(ColumnEngine columnEngine, Object... batchArgs) {
+        return this.updateOrInsertArgs(batchArgs, columnEngine);
+    }
+
+    int updateOrInsertArgs(Object[] batchArgs, ColumnEngine columnEngine);
+
+    int updateOrInsertArgs(Collection<?> batchArgs, ColumnEngine columnEngine);
+
+    default <T extends Model> int updateOrInsertRecord(Class<T> modelClass, Object... records) {
+        return this.updateOrInsertRecord(records, modelClass);
+    }
+
+    default <T extends Model> int updateOrInsertRecord(String tableName, Class<T> modelClass, Object... records) {
+        return this.updateOrInsertRecord(records, tableName, modelClass);
+    }
+
+    <T extends Model> int updateOrInsertRecord(Object[] records, Class<T> modelClass);
+
+    <T extends Model> int updateOrInsertRecord(Object[] records, String tableName, Class<T> modelClass);
+
+    <T extends Model> int updateOrInsertRecord(Collection<?> records, Class<T> modelClass);
+
+    <T extends Model> int updateOrInsertRecord(Collection<?> records, String tableName, Class<T> modelClass);
+
+    default int updateOrInsertRecord(ColumnEngine columnEngine, Object... records) {
+        return this.updateOrInsertRecord(records, columnEngine);
+    }
+
+    int updateOrInsertRecord(Object[] records, ColumnEngine columnEngine);
+
+    int updateOrInsertRecord(Collection<?> records, ColumnEngine columnEngine);
+
 }

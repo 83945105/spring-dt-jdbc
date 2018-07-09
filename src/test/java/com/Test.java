@@ -8,6 +8,7 @@ import com.dt.jdbc.core.SpringJdbcEngine;
 import com.shiro.model.JurResModel;
 import com.shiro.model.JurRole;
 import com.shiro.model.JurRoleModel;
+import com.shiro.model.JurRoleUserModel;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -73,7 +74,7 @@ public class Test {
     public void method3() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://192.168.3.3:3306/shiro-manager-spring?useSSL=false");
+        dataSource.setUrl("jdbc:mysql://192.168.0.112:3306/shiro-manager-spring?useSSL=false");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
 
@@ -133,8 +134,81 @@ public class Test {
         System.out.println(tt + " = " + tt / 1000000);
     }
 
+    public void method4() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://192.168.0.112:3306/shiro-manager-spring?useSSL=false");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate.setDataSource(dataSource);
+
+        SpringJdbcEngine engine = new SpringJdbcEngine();
+        engine.setJdbcTemplate(jdbcTemplate);
+
+        int count = 100;
+        long tt = 0;
+        for (int i = 0; i < count; i++) {
+            long start = System.nanoTime();
+            engine.queryForList(MySqlEngine.main(JurRoleModel.class)
+                    .innerJoin(JurRoleUserModel.class, (on, joinTable, mainTable) -> on
+                            .and(joinTable.roleId().equalTo(mainTable.id())))
+                    .column(table -> table)
+                    .column(JurRoleUserModel.class, table -> table.createTime("createTime2"))
+                    .virtualColumn("666", "233"));
+            long end = System.nanoTime() - start;
+            System.out.println(end + " - " + end / 1000000);
+            tt += end;
+        }
+        System.out.println(tt + " = " + tt / 1000000);
+    }
+
+    public void method5() {
+        DriverManagerDataSource dataSource = new DriverManagerDataSource();
+        dataSource.setDriverClassName("com.mysql.jdbc.Driver");
+        dataSource.setUrl("jdbc:mysql://192.168.0.112:3306/shiro-manager-spring?useSSL=false");
+        dataSource.setUsername("root");
+        dataSource.setPassword("root");
+
+        JdbcTemplate jdbcTemplate = new JdbcTemplate();
+        jdbcTemplate.setDataSource(dataSource);
+
+        SpringJdbcEngine engine = new SpringJdbcEngine();
+        engine.setJdbcTemplate(jdbcTemplate);
+
+        JurRole record = new JurRole();
+        record.setId("2048");
+        record.setDescription("64646");
+        record.setParentId("233");
+
+        int count = 1;
+        long tt = 0;
+        for (int i = 0; i < count; i++) {
+            long start = System.nanoTime();
+
+/*            engine.updateRecordSelective(record, MySqlEngine.main(JurRoleModel.class)
+                    .innerJoin(JurRoleUserModel.class, (on, joinTable, mainTable) -> on
+                            .and(joinTable.roleId().equalTo(mainTable.id())))
+                    .where(JurRoleUserModel.class, (condition, table, mainTable) -> condition
+                            .and(table.id().equalTo(1024))));*/
+
+/*            engine.updateRecordSelective(record, MySqlEngine.main(JurRoleModel.class)
+                    .where((condition, mainTable) -> condition.and(mainTable.id().equalTo("1024"))));*/
+
+//            engine.updateRecordByPrimaryKeySelective("1024", record, JurRoleModel.class);
+
+//            engine.updateOrInsertRecord(new Object[]{record}, MySqlEngine.column(JurRoleModel.class).column(table -> table.id().parentId()));
+
+            long end = System.nanoTime() - start;
+            System.out.println(end + " - " + end / 1000000);
+            tt += end;
+        }
+        System.out.println(tt + " = " + tt / 1000000);
+    }
+
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {
 
-        new Test().method3();
+        new Test().method5();
     }
 }

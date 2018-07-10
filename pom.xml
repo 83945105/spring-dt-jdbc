@@ -5,7 +5,7 @@
 
     <groupId>com.github.83945105</groupId>
     <artifactId>spring-dt-jdbc</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>spring-dt-jdbc</name>
@@ -43,7 +43,7 @@
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
 
-        <spring-dt-core.version>0.0.1-SNAPSHOT</spring-dt-core.version>
+        <spring-dt-core.version>0.0.1</spring-dt-core.version>
         <spring.version>5.0.4.RELEASE</spring.version>
         <druid.version>1.1.8</druid.version>
     </properties>

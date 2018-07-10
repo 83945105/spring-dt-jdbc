@@ -48,6 +48,16 @@ public interface JdbcEngine {
         return this.queryForList(engine);
     }
 
+    default <T> List<T> pageQueryForList(Class<T> returnType, int currentPage, int pageSize, LimitEngine engine) {
+        int count = this.queryCount(engine);
+        if (count == 0) {
+            return new ArrayList<>();
+        }
+        PageSupport pageSupport = new PageSupport(count, currentPage, pageSize);
+        engine.limit(pageSupport.getLimitStart(), pageSupport.getLimitEnd());
+        return this.queryForList(returnType, engine);
+    }
+
     <K, V> Map<K, V> queryPairColumnInMap(Engine engine);
 
     <K, V> Map<K, V> queryPairColumnInMap(int keyIndex, int valueIndex, Engine engine);

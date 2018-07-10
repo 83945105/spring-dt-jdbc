@@ -8,9 +8,11 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Created by 白超 on 2018/7/7.
+ * @author 白超
+ * @version 1.0
+ * @since 2018/7/10
  */
-public class BatchArgumentPreparedStatementSetter implements PreparedStatementSetter, ParameterDisposer {
+public final class BatchArgumentPreparedStatementSetter implements PreparedStatementSetter, ParameterDisposer {
 
     private Object[] argsArray;
 
@@ -92,7 +94,7 @@ public class BatchArgumentPreparedStatementSetter implements PreparedStatementSe
         }
     }
 
-    protected void doSetValue(PreparedStatement ps, int parameterPosition, Object argValue) throws SQLException {
+    private void doSetValue(PreparedStatement ps, int parameterPosition, Object argValue) throws SQLException {
         if (argValue instanceof SqlParameterValue) {
             SqlParameterValue paramValue = (SqlParameterValue) argValue;
             StatementCreatorUtils.setParameterValue(ps, parameterPosition, paramValue, paramValue.getValue());

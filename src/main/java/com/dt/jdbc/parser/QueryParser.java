@@ -8,7 +8,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by 白超 on 2018/7/3.
+ * 查询数据解析器
+ *
+ * @author 白超
+ * @version 1.0
+ * @since 2018/7/10
  */
 public class QueryParser {
 

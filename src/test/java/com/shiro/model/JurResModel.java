@@ -20,7 +20,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
     /**
      * 主键名
      */
-    public static final String primaryKeyName = "id";
+    public static final String primaryKeyName = "ID";
     /**
      * 主键别名
      */
@@ -867,7 +867,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 主键
          */
         public Group primaryKey() {
-            this.columns.add(JurResModel.primaryKeyName);
+            this.addColumn(JurResModel.primaryKeyName);
             return this;
         }
     
@@ -875,7 +875,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * ID-c:hidden
          */
         public Group id() {
-            this.columns.add(JurResModel.id);
+            this.addColumn(JurResModel.id);
             return this;
         }
 
@@ -883,7 +883,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 名称
          */
         public Group name() {
-            this.columns.add(JurResModel.name);
+            this.addColumn(JurResModel.name);
             return this;
         }
 
@@ -891,7 +891,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 类型
          */
         public Group type() {
-            this.columns.add(JurResModel.type);
+            this.addColumn(JurResModel.type);
             return this;
         }
 
@@ -899,7 +899,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * url
          */
         public Group url() {
-            this.columns.add(JurResModel.url);
+            this.addColumn(JurResModel.url);
             return this;
         }
 
@@ -907,7 +907,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 页面路径
          */
         public Group path() {
-            this.columns.add(JurResModel.path);
+            this.addColumn(JurResModel.path);
             return this;
         }
 
@@ -915,7 +915,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 资源描述
          */
         public Group description() {
-            this.columns.add(JurResModel.description);
+            this.addColumn(JurResModel.description);
             return this;
         }
 
@@ -923,7 +923,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 父id
          */
         public Group parentId() {
-            this.columns.add(JurResModel.parentId);
+            this.addColumn(JurResModel.parentId);
             return this;
         }
 
@@ -931,7 +931,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 祖先id
          */
         public Group parentIds() {
-            this.columns.add(JurResModel.parentIds);
+            this.addColumn(JurResModel.parentIds);
             return this;
         }
 
@@ -939,7 +939,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 权限
          */
         public Group permission() {
-            this.columns.add(JurResModel.permission);
+            this.addColumn(JurResModel.permission);
             return this;
         }
 
@@ -947,7 +947,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 
          */
         public Group index() {
-            this.columns.add(JurResModel.index);
+            this.addColumn(JurResModel.index);
             return this;
         }
 
@@ -955,7 +955,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 状态(00:正常,01:删除)-d:0
          */
         public Group status() {
-            this.columns.add(JurResModel.status);
+            this.addColumn(JurResModel.status);
             return this;
         }
 
@@ -963,7 +963,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 创建时间
          */
         public Group createTime() {
-            this.columns.add(JurResModel.createTime);
+            this.addColumn(JurResModel.createTime);
             return this;
         }
 
@@ -971,7 +971,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 修改时间
          */
         public Group updateTime() {
-            this.columns.add(JurResModel.updateTime);
+            this.addColumn(JurResModel.updateTime);
             return this;
         }
 
@@ -979,7 +979,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 删除时间
          */
         public Group deleteTime() {
-            this.columns.add(JurResModel.deleteTime);
+            this.addColumn(JurResModel.deleteTime);
             return this;
         }
 
@@ -987,7 +987,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 创建时间
          */
         public Group createTimeStamp() {
-            this.columns.add(JurResModel.createTimeStamp);
+            this.addColumn(JurResModel.createTimeStamp);
             return this;
         }
 
@@ -995,7 +995,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 修改时间
          */
         public Group updateTimeStamp() {
-            this.columns.add(JurResModel.updateTimeStamp);
+            this.addColumn(JurResModel.updateTimeStamp);
             return this;
         }
 
@@ -1003,7 +1003,7 @@ public final class JurResModel implements Model<JurResModel, JurResModel.Column,
          * 删除时间
          */
         public Group deleteTimeStamp() {
-            this.columns.add(JurResModel.deleteTimeStamp);
+            this.addColumn(JurResModel.deleteTimeStamp);
             return this;
         }
 

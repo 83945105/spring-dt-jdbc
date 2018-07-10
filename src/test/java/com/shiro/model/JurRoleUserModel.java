@@ -20,7 +20,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
     /**
      * 主键名
      */
-    public static final String primaryKeyName = "id";
+    public static final String primaryKeyName = "ID";
     /**
      * 主键别名
      */
@@ -744,7 +744,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 主键
          */
         public Group primaryKey() {
-            this.columns.add(JurRoleUserModel.primaryKeyName);
+            this.addColumn(JurRoleUserModel.primaryKeyName);
             return this;
         }
     
@@ -752,7 +752,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * ID-c:hidden
          */
         public Group id() {
-            this.columns.add(JurRoleUserModel.id);
+            this.addColumn(JurRoleUserModel.id);
             return this;
         }
 
@@ -760,7 +760,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 角色id
          */
         public Group roleId() {
-            this.columns.add(JurRoleUserModel.roleId);
+            this.addColumn(JurRoleUserModel.roleId);
             return this;
         }
 
@@ -768,7 +768,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 角色
          */
         public Group role() {
-            this.columns.add(JurRoleUserModel.role);
+            this.addColumn(JurRoleUserModel.role);
             return this;
         }
 
@@ -776,7 +776,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 角色名称
          */
         public Group roleName() {
-            this.columns.add(JurRoleUserModel.roleName);
+            this.addColumn(JurRoleUserModel.roleName);
             return this;
         }
 
@@ -784,7 +784,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 用户id
          */
         public Group userId() {
-            this.columns.add(JurRoleUserModel.userId);
+            this.addColumn(JurRoleUserModel.userId);
             return this;
         }
 
@@ -792,7 +792,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 用户名
          */
         public Group userName() {
-            this.columns.add(JurRoleUserModel.userName);
+            this.addColumn(JurRoleUserModel.userName);
             return this;
         }
 
@@ -800,7 +800,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 
          */
         public Group index() {
-            this.columns.add(JurRoleUserModel.index);
+            this.addColumn(JurRoleUserModel.index);
             return this;
         }
 
@@ -808,7 +808,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 状态(00:正常,01:删除)-d:0
          */
         public Group status() {
-            this.columns.add(JurRoleUserModel.status);
+            this.addColumn(JurRoleUserModel.status);
             return this;
         }
 
@@ -816,7 +816,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 创建时间
          */
         public Group createTime() {
-            this.columns.add(JurRoleUserModel.createTime);
+            this.addColumn(JurRoleUserModel.createTime);
             return this;
         }
 
@@ -824,7 +824,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 修改时间
          */
         public Group updateTime() {
-            this.columns.add(JurRoleUserModel.updateTime);
+            this.addColumn(JurRoleUserModel.updateTime);
             return this;
         }
 
@@ -832,7 +832,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 删除时间
          */
         public Group deleteTime() {
-            this.columns.add(JurRoleUserModel.deleteTime);
+            this.addColumn(JurRoleUserModel.deleteTime);
             return this;
         }
 
@@ -840,7 +840,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 创建时间
          */
         public Group createTimeStamp() {
-            this.columns.add(JurRoleUserModel.createTimeStamp);
+            this.addColumn(JurRoleUserModel.createTimeStamp);
             return this;
         }
 
@@ -848,7 +848,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 修改时间
          */
         public Group updateTimeStamp() {
-            this.columns.add(JurRoleUserModel.updateTimeStamp);
+            this.addColumn(JurRoleUserModel.updateTimeStamp);
             return this;
         }
 
@@ -856,7 +856,7 @@ public final class JurRoleUserModel implements Model<JurRoleUserModel, JurRoleUs
          * 删除时间
          */
         public Group deleteTimeStamp() {
-            this.columns.add(JurRoleUserModel.deleteTimeStamp);
+            this.addColumn(JurRoleUserModel.deleteTimeStamp);
             return this;
         }
 

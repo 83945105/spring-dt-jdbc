@@ -16,7 +16,11 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by 白超 on 2018/7/3.
+ * SpringJdbc引擎
+ *
+ * @author 白超
+ * @version 1.0
+ * @since 2018/7/10
  */
 public class SpringJdbcEngine implements JdbcEngine {
 

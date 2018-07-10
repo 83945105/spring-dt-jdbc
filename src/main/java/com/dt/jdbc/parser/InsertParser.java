@@ -1,7 +1,7 @@
 package com.dt.jdbc.parser;
 
 import com.dt.beans.BeanUtils;
-import com.dt.beans.ClassMethodAccessCache;
+import com.dt.beans.ClassAccessCache;
 import com.dt.core.data.ParseData;
 import com.esotericsoftware.reflectasm.MethodAccess;
 
@@ -10,11 +10,15 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by 白超 on 2018/7/7.
+ * 新增数据解析器
+ *
+ * @author 白超
+ * @version 1.0
+ * @since 2018/7/10
  */
 public class InsertParser {
 
-    private ClassMethodAccessCache cache = new ClassMethodAccessCache();
+    private ClassAccessCache cache = new ClassAccessCache();
 
     public String insert(String tableName, Map<String, String> columnAliasMap) {
         StringBuilder sql = new StringBuilder(64);
@@ -199,7 +203,7 @@ public class InsertParser {
     }
 
     @SuppressWarnings("unused")
-    public void setCache(ClassMethodAccessCache cache) {
+    public void setCache(ClassAccessCache cache) {
         this.cache = cache;
     }
 }

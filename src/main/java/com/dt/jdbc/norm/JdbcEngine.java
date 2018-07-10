@@ -1,19 +1,26 @@
 package com.dt.jdbc.norm;
 
 import com.dt.core.engine.ColumnEngine;
+import com.dt.core.engine.LimitEngine;
 import com.dt.core.engine.WhereEngine;
 import com.dt.core.norm.Engine;
 import com.dt.core.norm.Model;
+import com.dt.jdbc.bean.PageSupport;
+import com.dt.jdbc.core.SpringJdbcEngine;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
 /**
  * jdbc 增删改查接口
- * 提供总计多达100+种方法
+ * <p>提供总计多达<b>100+</b>种方法
  *
  * @author 白超
+ * @version 1.0
+ * @see SpringJdbcEngine
+ * @since 2018/7/10
  */
 public interface JdbcEngine {
 
@@ -30,6 +37,16 @@ public interface JdbcEngine {
     <T> List<T> queryForList(Class<T> returnType, Engine engine);
 
     int queryCount(Engine engine);
+
+    default List<Map<String, Object>> pageQueryForList(int currentPage, int pageSize, LimitEngine engine) {
+        int count = this.queryCount(engine);
+        if (count == 0) {
+            return new ArrayList<>();
+        }
+        PageSupport pageSupport = new PageSupport(count, currentPage, pageSize);
+        engine.limit(pageSupport.getLimitStart(), pageSupport.getLimitEnd());
+        return this.queryForList(engine);
+    }
 
     <K, V> Map<K, V> queryPairColumnInMap(Engine engine);
 

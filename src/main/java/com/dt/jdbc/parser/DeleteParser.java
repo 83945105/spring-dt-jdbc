@@ -7,7 +7,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by 白超 on 2018/7/9.
+ * 删除解析器
+ *
+ * @author 白超
+ * @version 1.0
+ * @since 2018/7/10
  */
 public class DeleteParser {
 

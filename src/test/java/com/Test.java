@@ -5,8 +5,6 @@ import com.dt.core.engine.MySqlEngine;
 import com.dt.core.jdbc.JdbcSourceEngine;
 import com.dt.core.model.ModelTemplateEngine;
 import com.dt.jdbc.core.SpringJdbcEngine;
-import com.shiro.model.JurResModel;
-import com.shiro.model.JurRole;
 import com.shiro.model.JurRoleModel;
 import com.shiro.model.JurRoleUserModel;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,7 +19,7 @@ import java.util.*;
 public class Test {
 
     public void method1() throws SQLException {
-        JdbcSourceEngine engine = JdbcSourceEngine.newMySqlEngine("192.168.3.3",
+        JdbcSourceEngine engine = JdbcSourceEngine.newMySqlEngine("192.168.0.112",
                 "3306", "shiro-manager-spring", "root", "root");
 
         new ModelTemplateEngine(engine, new HumpConverter())
@@ -45,7 +43,7 @@ public class Test {
         tt = 0;
         for (int i = 0; i < count; i++) {
             long start = System.nanoTime();
-            JurResModel model = new JurResModel();
+//            JurResModel model = new JurResModel();
             long end = System.nanoTime() - start;
             tt += end;
         }
@@ -54,12 +52,12 @@ public class Test {
 
         System.out.println("-----------------------------------------");
         tt = 0;
-        for (int i = 0; i < count; i++) {
+/*        for (int i = 0; i < count; i++) {
             long start = System.nanoTime();
             JurResModel model = JurResModel.class.newInstance();
             long end = System.nanoTime() - start;
             tt += end;
-        }
+        }*/
         System.out.println(tt + " - " + tt / 1000000);
         System.out.println(tt / count + " - " + tt / 1000000 / count);
         System.out.println("-----------------------------------------");
@@ -85,7 +83,7 @@ public class Test {
         engine.setJdbcTemplate(jdbcTemplate);
 
         Map<String, String> record;
-        JurRole role;
+/*        JurRole role;*/
 
         List<String> args = new ArrayList<>();
         args.add(UUID.randomUUID().toString());
@@ -95,24 +93,24 @@ public class Test {
             records.add(Test.newMap("id", UUID.randomUUID().toString()));
         }
 
-        List<JurRole> roleList = new ArrayList<>();
+/*        List<JurRole> roleList = new ArrayList<>();
         for (int i = 0; i < 10000; i++) {
             JurRole r = new JurRole();
             r.setId(UUID.randomUUID().toString());
             roleList.add(r);
-        }
+        }*/
 
         List<List<String>> lists = new ArrayList<>();
         lists.add(new ArrayList<>());
 
         int count = 100;
-        int r;
+        int r = 0;
         long tt = 0;
         for (int i = 0; i < count; i++) {
             record = new LinkedHashMap<>();
             record.put("id", UUID.randomUUID().toString());
-            role = new JurRole();
-            role.setId(UUID.randomUUID().toString());
+//            role = new JurRole();
+//            role.setId(UUID.randomUUID().toString());
             long start = System.nanoTime();
 //            r = engine.insertRecord(record, JurRoleModel.class);
 //            r = engine.insertRecord(role, JurRoleModel.class);
@@ -123,7 +121,7 @@ public class Test {
 //            r = engine.batchInsertRecords(JurRoleModel.class, new LinkedHashMap<>(), new HashMap<>());
 //            r = engine.batchInsertRecords(records, JurRoleModel.class);
 //            r = engine.batchInsertRecords(roleList, JurRoleModel.class);
-            r = engine.updateArgsByPrimaryKey("666", JurRoleModel.class, "123", null, null, null, null, null, null, null, null, null, null, null, null, null);
+//            r = engine.updateArgsByPrimaryKey("666", JurRoleModel.class, "123", null, null, null, null, null, null, null, null, null, null, null, null, null);
             long end = System.nanoTime() - start;
             System.out.println(end + " - " + end / 1000000);
             tt += end;
@@ -177,14 +175,14 @@ public class Test {
         SpringJdbcEngine engine = new SpringJdbcEngine();
         engine.setJdbcTemplate(jdbcTemplate);
 
-        JurRole record = new JurRole();
+/*        JurRole record = new JurRole();
         record.setId("1024");
         record.setDescription("64646");
         record.setParentId("233");
         JurRole record2 = new JurRole();
         record2.setId("2048");
         record2.setDescription("64646");
-        record2.setParentId("233");
+        record2.setParentId("233");*/
 
         int count = 1;
         long tt = 0;
@@ -216,11 +214,11 @@ public class Test {
 
 //            engine.batchDeleteByPrimaryKeys(JurRoleModel.class, "666", "777");
 
-            engine.delete(MySqlEngine.main(JurRoleModel.class)
+/*            engine.delete(MySqlEngine.main(JurRoleModel.class)
                     .innerJoin(JurRoleUserModel.class, (on, joinTable, mainTable) -> on
                             .and(joinTable.roleId().equalTo(mainTable.id())))
                     .where((condition, mainTable) -> condition
-                            .and(mainTable.deleteTime().equalTo("64646464"))));
+                            .and(mainTable.deleteTime().equalTo("64646464"))));*/
 
             long end = System.nanoTime() - start;
             System.out.println(end + " - " + end / 1000000);
@@ -231,6 +229,6 @@ public class Test {
 
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {
 
-        new Test().method5();
+        new Test().method4();
     }
 }

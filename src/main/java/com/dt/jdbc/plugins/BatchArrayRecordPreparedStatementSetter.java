@@ -1,7 +1,7 @@
 package com.dt.jdbc.plugins;
 
 import com.dt.beans.BeanUtils;
-import com.dt.beans.ClassMethodAccessCache;
+import com.dt.beans.ClassAccessCache;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import org.springframework.jdbc.core.*;
 
@@ -10,15 +10,17 @@ import java.sql.SQLException;
 import java.util.Map;
 
 /**
- * Created by 白超 on 2018/7/7.
+ * @author 白超
+ * @version 1.0
+ * @since 2018/7/10
  */
-public class BatchArrayRecordPreparedStatementSetter implements PreparedStatementSetter, ParameterDisposer {
+public final class BatchArrayRecordPreparedStatementSetter implements PreparedStatementSetter, ParameterDisposer {
 
     private Object[] recordArray;
 
     private Map<String, String> columnAliasMap;
 
-    private ClassMethodAccessCache cache = new ClassMethodAccessCache();
+    private ClassAccessCache cache = new ClassAccessCache();
 
     public BatchArrayRecordPreparedStatementSetter(Object[] recordArray, Map<String, String> columnAliasMap) {
         this.recordArray = recordArray;
@@ -45,7 +47,7 @@ public class BatchArrayRecordPreparedStatementSetter implements PreparedStatemen
         }
     }
 
-    protected void doSetValue(PreparedStatement ps, int parameterPosition, Object argValue) throws SQLException {
+    private void doSetValue(PreparedStatement ps, int parameterPosition, Object argValue) throws SQLException {
         if (argValue instanceof SqlParameterValue) {
             SqlParameterValue paramValue = (SqlParameterValue) argValue;
             StatementCreatorUtils.setParameterValue(ps, parameterPosition, paramValue, paramValue.getValue());
@@ -61,7 +63,7 @@ public class BatchArrayRecordPreparedStatementSetter implements PreparedStatemen
         }
     }
 
-    public void setCache(ClassMethodAccessCache cache) {
+    public void setCache(ClassAccessCache cache) {
         this.cache = cache;
     }
 }

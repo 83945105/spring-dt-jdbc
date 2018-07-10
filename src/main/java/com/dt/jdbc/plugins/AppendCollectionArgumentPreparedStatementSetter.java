@@ -10,9 +10,11 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * Created by 白超 on 2018/7/8.
+ * @author 白超
+ * @version 1.0
+ * @since 2018/7/10
  */
-public class AppendCollectionArgumentPreparedStatementSetter implements PreparedStatementSetter, ParameterDisposer {
+public final class AppendCollectionArgumentPreparedStatementSetter implements PreparedStatementSetter, ParameterDisposer {
 
     private Collection<Object> args;
 
@@ -40,7 +42,7 @@ public class AppendCollectionArgumentPreparedStatementSetter implements Prepared
         }
     }
 
-    protected void doSetValue(PreparedStatement ps, int parameterPosition, Object argValue) throws SQLException {
+    private void doSetValue(PreparedStatement ps, int parameterPosition, Object argValue) throws SQLException {
         if (argValue instanceof SqlParameterValue) {
             SqlParameterValue paramValue = (SqlParameterValue) argValue;
             StatementCreatorUtils.setParameterValue(ps, parameterPosition, paramValue, paramValue.getValue());

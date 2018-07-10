@@ -1,3 +1,0 @@
-[# th:each="item : ${array}"]
-  - [# th:text="${item}" /]
-[/]

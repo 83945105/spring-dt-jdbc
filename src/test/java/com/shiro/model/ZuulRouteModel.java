@@ -744,7 +744,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 主键
          */
         public Group primaryKey() {
-            this.columns.add(ZuulRouteModel.primaryKeyName);
+            this.addColumn(ZuulRouteModel.primaryKeyName);
             return this;
         }
     
@@ -752,7 +752,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 主键
          */
         public Group id() {
-            this.columns.add(ZuulRouteModel.id);
+            this.addColumn(ZuulRouteModel.id);
             return this;
         }
 
@@ -760,7 +760,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 
          */
         public Group path() {
-            this.columns.add(ZuulRouteModel.path);
+            this.addColumn(ZuulRouteModel.path);
             return this;
         }
 
@@ -768,7 +768,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 
          */
         public Group serviceId() {
-            this.columns.add(ZuulRouteModel.serviceId);
+            this.addColumn(ZuulRouteModel.serviceId);
             return this;
         }
 
@@ -776,7 +776,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 
          */
         public Group serviceName() {
-            this.columns.add(ZuulRouteModel.serviceName);
+            this.addColumn(ZuulRouteModel.serviceName);
             return this;
         }
 
@@ -784,7 +784,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 
          */
         public Group url() {
-            this.columns.add(ZuulRouteModel.url);
+            this.addColumn(ZuulRouteModel.url);
             return this;
         }
 
@@ -792,7 +792,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 登录地址
          */
         public Group loginUrl() {
-            this.columns.add(ZuulRouteModel.loginUrl);
+            this.addColumn(ZuulRouteModel.loginUrl);
             return this;
         }
 
@@ -800,7 +800,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 
          */
         public Group index() {
-            this.columns.add(ZuulRouteModel.index);
+            this.addColumn(ZuulRouteModel.index);
             return this;
         }
 
@@ -808,7 +808,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 状态(00:正常,01:删除)-d:0
          */
         public Group status() {
-            this.columns.add(ZuulRouteModel.status);
+            this.addColumn(ZuulRouteModel.status);
             return this;
         }
 
@@ -816,7 +816,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 创建时间
          */
         public Group createTime() {
-            this.columns.add(ZuulRouteModel.createTime);
+            this.addColumn(ZuulRouteModel.createTime);
             return this;
         }
 
@@ -824,7 +824,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 修改时间
          */
         public Group updateTime() {
-            this.columns.add(ZuulRouteModel.updateTime);
+            this.addColumn(ZuulRouteModel.updateTime);
             return this;
         }
 
@@ -832,7 +832,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 删除时间
          */
         public Group deleteTime() {
-            this.columns.add(ZuulRouteModel.deleteTime);
+            this.addColumn(ZuulRouteModel.deleteTime);
             return this;
         }
 
@@ -840,7 +840,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 创建时间
          */
         public Group createTimeStamp() {
-            this.columns.add(ZuulRouteModel.createTimeStamp);
+            this.addColumn(ZuulRouteModel.createTimeStamp);
             return this;
         }
 
@@ -848,7 +848,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 修改时间
          */
         public Group updateTimeStamp() {
-            this.columns.add(ZuulRouteModel.updateTimeStamp);
+            this.addColumn(ZuulRouteModel.updateTimeStamp);
             return this;
         }
 
@@ -856,7 +856,7 @@ public final class ZuulRouteModel implements Model<ZuulRouteModel, ZuulRouteMode
          * 删除时间
          */
         public Group deleteTimeStamp() {
-            this.columns.add(ZuulRouteModel.deleteTimeStamp);
+            this.addColumn(ZuulRouteModel.deleteTimeStamp);
             return this;
         }
 

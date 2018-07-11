@@ -171,7 +171,7 @@ public class UpdateParser {
         }
         parseData = whereEngine.getWhereParseData();
         if (parseData != null && parseData.getSql() != null) {
-            sql.append(" where ").append(parseData.getSql());
+            sql.append(" ").append(parseData.getSql());
             args.addAll(parseData.getArgs());
         }
         parseData = new ParseData();
@@ -214,7 +214,7 @@ public class UpdateParser {
         }
         parseData = whereEngine.getWhereParseData();
         if (parseData != null && parseData.getSql() != null) {
-            sql.append(" where ").append(parseData.getSql());
+            sql.append(" ").append(parseData.getSql());
             args.addAll(parseData.getArgs());
         }
         parseData = new ParseData();
@@ -259,7 +259,7 @@ public class UpdateParser {
         }
         parseData = whereEngine.getWhereParseData();
         if (parseData != null && parseData.getSql() != null) {
-            sql.append(" where ").append(parseData.getSql());
+            sql.append(" ").append(parseData.getSql());
             args.addAll(parseData.getArgs());
         }
         parseData = new ParseData();
@@ -308,7 +308,7 @@ public class UpdateParser {
         }
         parseData = whereEngine.getWhereParseData();
         if (parseData != null && parseData.getSql() != null) {
-            sql.append(" where ").append(parseData.getSql());
+            sql.append(" ").append(parseData.getSql());
             args.addAll(parseData.getArgs());
         }
         parseData = new ParseData();

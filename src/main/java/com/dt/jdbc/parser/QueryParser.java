@@ -48,7 +48,7 @@ public class QueryParser {
         }
         parseData = engine.getWhereParseData();
         if (parseData != null && parseData.getSql() != null) {
-            sql.append(" where ").append(parseData.getSql());
+            sql.append(" ").append(parseData.getSql());
             args.addAll(parseData.getArgs());
         }
         str = engine.getGroupSql();
@@ -91,7 +91,7 @@ public class QueryParser {
         }
         parseData = engine.getWhereParseData();
         if (parseData != null && parseData.getSql() != null) {
-            sql.append(" where ").append(parseData.getSql());
+            sql.append(" ").append(parseData.getSql());
             args.addAll(parseData.getArgs());
         }
         if (hasGroup) {

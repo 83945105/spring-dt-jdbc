@@ -5,6 +5,7 @@ import com.dt.core.engine.LimitEngine;
 import com.dt.core.engine.WhereEngine;
 import com.dt.core.norm.Engine;
 import com.dt.core.norm.Model;
+import com.dt.jdbc.bean.PageResult;
 import com.dt.jdbc.bean.PageSupport;
 import com.dt.jdbc.core.SpringJdbcEngine;
 
@@ -24,6 +25,14 @@ import java.util.Map;
  */
 public interface JdbcEngine {
 
+    int copyTable(String sourceTableName, String targetTableName);
+
+    int deleteTable(String tableName);
+
+    int renameTable(String sourceTableName, String targetTableName);
+
+    boolean isTableExist(String tableName);
+
     Map<String, Object> queryByPrimaryKey(Object keyValue, ColumnEngine columnEngine);
 
     <T> T queryByPrimaryKey(Object keyValue, Class<T> returnType, ColumnEngine columnEngine);
@@ -38,24 +47,32 @@ public interface JdbcEngine {
 
     int queryCount(Engine engine);
 
-    default List<Map<String, Object>> pageQueryForList(int currentPage, int pageSize, LimitEngine engine) {
+    default PageResult pageQueryForList(int currentPage, int pageSize, LimitEngine engine) {
         int count = this.queryCount(engine);
-        if (count == 0) {
-            return new ArrayList<>();
-        }
         PageSupport pageSupport = new PageSupport(count, currentPage, pageSize);
+        PageResult pageResult = new PageResult();
+        pageResult.setLimit(pageSupport);
+        if (count == 0) {
+            pageResult.setMapList(new ArrayList<>());
+            return pageResult;
+        }
         engine.limit(pageSupport.getLimitStart(), pageSupport.getLimitEnd());
-        return this.queryForList(engine);
+        pageResult.setMapList(this.queryForList(engine));
+        return pageResult;
     }
 
-    default <T> List<T> pageQueryForList(Class<T> returnType, int currentPage, int pageSize, LimitEngine engine) {
+    default <T> PageResult<T> pageQueryForList(Class<T> returnType, int currentPage, int pageSize, LimitEngine engine) {
         int count = this.queryCount(engine);
-        if (count == 0) {
-            return new ArrayList<>();
-        }
         PageSupport pageSupport = new PageSupport(count, currentPage, pageSize);
+        PageResult pageResult = new PageResult();
+        pageResult.setLimit(pageSupport);
+        if (count == 0) {
+            pageResult.setObjectList(new ArrayList());
+            return pageResult;
+        }
         engine.limit(pageSupport.getLimitStart(), pageSupport.getLimitEnd());
-        return this.queryForList(returnType, engine);
+        pageResult.setObjectList(this.queryForList(returnType, engine));
+        return pageResult;
     }
 
     <K, V> Map<K, V> queryPairColumnInMap(Engine engine);

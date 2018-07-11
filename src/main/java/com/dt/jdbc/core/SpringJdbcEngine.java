@@ -38,6 +38,40 @@ public class SpringJdbcEngine implements JdbcEngine {
 
     private DeleteParser deleteParser = new DeleteParser();
 
+    private <T extends Model> Model newModel(Class<T> modelClass) {
+        Model model = null;
+        try {
+            model = modelClass.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return model;
+    }
+
+    @Override
+    public int copyTable(String sourceTableName, String targetTableName) {
+        String sql = "create table " + targetTableName + " like " + sourceTableName;
+        return this.jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public int deleteTable(String tableName) {
+        String sql = "drop table " + tableName;
+        return this.jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public int renameTable(String sourceTableName, String targetTableName) {
+        String sql = "rename table " + sourceTableName + " to " + targetTableName;
+        return this.jdbcTemplate.update(sql);
+    }
+
+    @Override
+    public boolean isTableExist(String tableName) {
+        String sql = "select count(*) from information_schema.TABLES where table_name = '" + tableName + "'";
+        return this.jdbcTemplate.queryForObject(sql, Integer.class) > 0;
+    }
+
     @Override
     public Map<String, Object> queryByPrimaryKey(Object keyValue, ColumnEngine columnEngine) {
         String sql = this.queryParser.selectByPrimaryKey(columnEngine);
@@ -96,16 +130,6 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <K, V> Map<K, V> queryPairColumnInMap(String keyColumnName, String valueColumnName, Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
         return this.jdbcTemplate.query(data.getSql(), data.getArgs().toArray(), new PairColumnResultSetExtractor<>(keyColumnName, valueColumnName));
-    }
-
-    private <T extends Model> Model newModel(Class<T> modelClass) {
-        Model model = null;
-        try {
-            model = modelClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-        return model;
     }
 
     @Override

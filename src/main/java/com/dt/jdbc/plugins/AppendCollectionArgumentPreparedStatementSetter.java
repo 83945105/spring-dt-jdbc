@@ -4,10 +4,7 @@ import org.springframework.jdbc.core.*;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
+import java.util.*;
 
 /**
  * @author 白超
@@ -16,28 +13,34 @@ import java.util.Iterator;
  */
 public final class AppendCollectionArgumentPreparedStatementSetter implements PreparedStatementSetter, ParameterDisposer {
 
-    private Collection<Object> args;
+    private Object args;
+
+    private Object[] appendArgs;
 
     public AppendCollectionArgumentPreparedStatementSetter(Object[] args, Object... appendArgs) {
-        this.args = new ArrayList<>();
-        for (Object arg : args) {
-            this.args.add(arg);
-        }
-        this.args.addAll(Arrays.asList(appendArgs));
+        this.args = args;
+        this.appendArgs = appendArgs;
     }
 
     public AppendCollectionArgumentPreparedStatementSetter(Collection args, Object... appendArgs) {
         this.args = args;
-        this.args.addAll(Arrays.asList(appendArgs));
+        this.appendArgs = appendArgs;
     }
 
     @Override
     public void setValues(PreparedStatement ps) throws SQLException {
         if (this.args != null) {
             int i = 0;
-            Iterator<Object> iterator = this.args.iterator();
-            while (iterator.hasNext()) {
-                doSetValue(ps, i++ + 1, iterator.next());
+            if (this.args instanceof Collection) {
+                Iterator iterator = ((Collection) this.args).iterator();
+                while (iterator.hasNext()) {
+                    doSetValue(ps, i++ + 1, iterator.next());
+                }
+            }
+            if (this.appendArgs != null) {
+                for (Object arg : this.appendArgs) {
+                    doSetValue(ps, i++ + 1, arg);
+                }
             }
         }
     }

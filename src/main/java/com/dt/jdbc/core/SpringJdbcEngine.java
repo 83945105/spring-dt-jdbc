@@ -1,19 +1,21 @@
 package com.dt.jdbc.core;
 
 import com.dt.core.data.ParseData;
-import com.dt.core.engine.*;
+import com.dt.core.engine.ColumnEngine;
+import com.dt.core.engine.WhereEngine;
 import com.dt.core.norm.Engine;
 import com.dt.core.norm.Model;
+import com.dt.jdbc.norm.JdbcEngine;
 import com.dt.jdbc.parser.*;
 import com.dt.jdbc.plugins.*;
-import com.dt.jdbc.norm.JdbcEngine;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.dao.support.DataAccessUtils;
+import org.springframework.jdbc.core.*;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * SpringJdbc引擎
@@ -22,7 +24,7 @@ import java.util.Map;
  * @version 1.0
  * @since 2018/7/10
  */
-public class SpringJdbcEngine implements JdbcEngine {
+public final class SpringJdbcEngine implements JdbcEngine {
 
     @Autowired
     @SuppressWarnings("all")
@@ -38,6 +40,8 @@ public class SpringJdbcEngine implements JdbcEngine {
 
     private DeleteParser deleteParser = new DeleteParser();
 
+    private final Log logger = LogFactory.getLog(getClass());
+
     private <T extends Model> Model newModel(Class<T> modelClass) {
         Model model = null;
         try {
@@ -48,88 +52,167 @@ public class SpringJdbcEngine implements JdbcEngine {
         return model;
     }
 
+    private void printPrecompileSqlAndArgs(String sql, Object prefixArgs, Object args, Object suffixArgs) {
+        if (logger.isDebugEnabled()) {
+            logger.debug(Ansi.ansi().eraseScreen()
+                    .fg(Ansi.Color.YELLOW)
+                    .a("Executing precompile SQL [" + sql + "]")
+                    .reset());
+            List<Object> objects = new ArrayList<>();
+            if (prefixArgs != null) {
+                if (prefixArgs instanceof Collection) {
+                    objects.addAll((Collection<?>) prefixArgs);
+                } else if (prefixArgs.getClass().isArray()) {
+                    Collections.addAll(objects, prefixArgs);
+                } else {
+                    objects.add(prefixArgs);
+                }
+            }
+            if (args != null) {
+                if (args instanceof Collection) {
+                    objects.addAll((Collection<?>) args);
+                } else if (args.getClass().isArray()) {
+                    Collections.addAll(objects, args);
+                } else {
+                    objects.add(args);
+                }
+            }
+            if (suffixArgs != null) {
+                if (suffixArgs instanceof Collection) {
+                    objects.addAll((Collection<?>) suffixArgs);
+                } else if (suffixArgs.getClass().isArray()) {
+                    Collections.addAll(objects, suffixArgs);
+                } else {
+                    objects.add(suffixArgs);
+                }
+            }
+            logger.debug(Ansi.ansi().eraseScreen()
+                    .fg(Ansi.Color.RED)
+                    .a("precompile SQL args " + objects.toString())
+                    .reset());
+        }
+    }
+
     @Override
     public int copyTable(String sourceTableName, String targetTableName) {
         String sql = "create table " + targetTableName + " like " + sourceTableName;
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql);
     }
 
     @Override
     public int deleteTable(String tableName) {
         String sql = "drop table " + tableName;
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql);
     }
 
     @Override
     public int renameTable(String sourceTableName, String targetTableName) {
         String sql = "rename table " + sourceTableName + " to " + targetTableName;
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql);
     }
 
     @Override
     public boolean isTableExist(String tableName) {
         String sql = "select count(*) from information_schema.TABLES where table_name = '" + tableName + "'";
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.queryForObject(sql, Integer.class) > 0;
     }
 
     @Override
     public Map<String, Object> queryByPrimaryKey(Object keyValue, ColumnEngine columnEngine) {
         String sql = this.queryParser.selectByPrimaryKey(columnEngine);
+        printPrecompileSqlAndArgs(sql, null, keyValue, null);
         return this.jdbcTemplate.queryForMap(sql, keyValue);
     }
 
     @Override
     public <T> T queryByPrimaryKey(Object keyValue, Class<T> returnType, ColumnEngine columnEngine) {
         String sql = this.queryParser.selectByPrimaryKey(columnEngine);
+        printPrecompileSqlAndArgs(sql, null, keyValue, null);
         return this.jdbcTemplate.queryForObject(sql, new Object[]{keyValue}, new BeanPropertyRowMapper<>(returnType));
     }
 
     @Override
     public Map<String, Object> queryOne(Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
-        return this.jdbcTemplate.queryForMap(data.getSql(), data.getArgs().toArray());
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        List<Map<String, Object>> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new RowMapperResultSetExtractor<>(new ColumnMapRowMapper(), 1));
+        return DataAccessUtils.nullableSingleResult(results);
     }
 
     @Override
     public <T> T queryOne(Class<T> returnType, Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
-        return this.jdbcTemplate.queryForObject(data.getSql(), data.getArgs().toArray(), new BeanPropertyRowMapper<>(returnType));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        List<T> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new RowMapperResultSetExtractor<>(new BeanPropertyRowMapper<>(returnType), 1));
+        return DataAccessUtils.nullableSingleResult(results);
     }
 
     @Override
     public List<Map<String, Object>> queryForList(Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
-        return this.jdbcTemplate.queryForList(data.getSql(), data.getArgs().toArray());
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new RowMapperResultSetExtractor<>(new ColumnMapRowMapper()));
     }
 
     @Override
     public <T> List<T> queryForList(Class<T> returnType, Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
-        return this.jdbcTemplate.query(data.getSql(), data.getArgs().toArray(), new BeanPropertyRowMapper<>(returnType));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new RowMapperResultSetExtractor<>(new BeanPropertyRowMapper<>(returnType)));
     }
 
     @Override
     public int queryCount(Engine engine) {
         ParseData data = this.queryParser.selectCount(engine);
-        return this.jdbcTemplate.queryForObject(data.getSql(), Integer.class, data.getArgs().toArray());
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        List<Integer> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new RowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(Integer.class), 1));
+        return DataAccessUtils.nullableSingleResult(results);
     }
 
     @Override
     public <K, V> Map<K, V> queryPairColumnInMap(Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
-        return this.jdbcTemplate.query(data.getSql(), data.getArgs().toArray(), new PairColumnResultSetExtractor<>());
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args), new PairColumnResultSetExtractor<>());
     }
 
     @Override
     public <K, V> Map<K, V> queryPairColumnInMap(int keyIndex, int valueIndex, Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
-        return this.jdbcTemplate.query(data.getSql(), data.getArgs().toArray(), new PairColumnResultSetExtractor<>(keyIndex, valueIndex));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args), new PairColumnResultSetExtractor<>(keyIndex, valueIndex));
     }
 
     @Override
     public <K, V> Map<K, V> queryPairColumnInMap(String keyColumnName, String valueColumnName, Engine engine) {
         ParseData data = this.queryParser.selectList(engine);
-        return this.jdbcTemplate.query(data.getSql(), data.getArgs().toArray(), new PairColumnResultSetExtractor<>(keyColumnName, valueColumnName));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args), new PairColumnResultSetExtractor<>(keyColumnName, valueColumnName));
     }
 
     @Override
@@ -137,6 +220,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertArgs(Object[] args, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.insertParser.insert(model.getTableName(), model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, args);
     }
 
@@ -145,6 +229,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertArgs(Object[] args, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.insertParser.insert(tableName, model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, args);
     }
 
@@ -153,6 +238,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertArgs(Collection<?> args, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.insertParser.insert(model.getTableName(), model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -161,6 +247,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertArgs(Collection<?> args, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.insertParser.insert(tableName, model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -172,6 +259,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.insertParser.insert(columnEngine.getTableName(), columnAliasMap);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, args);
     }
 
@@ -183,6 +271,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.insertParser.insert(columnEngine.getTableName(), columnAliasMap);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -191,7 +280,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecord(Map<String, ?> record, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertMap(model.getTableName(), model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -199,7 +291,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecord(Map<String, ?> record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertMap(tableName, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -207,7 +302,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecord(Object record, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertObject(model.getTableName(), model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -215,7 +313,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecord(Object record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertObject(tableName, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -226,7 +327,10 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         ParseData data = this.insertParser.insertMap(columnEngine.getTableName(), columnAliasMap, record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -237,7 +341,10 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         ParseData data = this.insertParser.insertObject(columnEngine.getTableName(), columnAliasMap, record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -245,7 +352,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecordSelective(Map<String, ?> record, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertMapSelective(model.getTableName(), model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -253,7 +363,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecordSelective(Map<String, ?> record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertMapSelective(tableName, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -261,7 +374,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecordSelective(Object record, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertObjectSelective(model.getTableName(), model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -269,7 +385,10 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int insertRecordSelective(Object record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         ParseData data = this.insertParser.insertObjectSelective(tableName, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -280,7 +399,10 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         ParseData data = this.insertParser.insertMapSelective(columnEngine.getTableName(), columnAliasMap, record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -291,7 +413,10 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         ParseData data = this.insertParser.insertObjectSelective(columnEngine.getTableName(), columnAliasMap, record);
-        return this.jdbcTemplate.update(data.getSql(), new CollectionArgumentPreparedStatementSetter(data.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -300,6 +425,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(model.getTableName(), columnAliasMap, batchArgs.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -309,6 +435,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(tableName, columnAliasMap, batchArgs.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -318,6 +445,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(model.getTableName(), columnAliasMap, batchArgs.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -327,6 +455,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(tableName, columnAliasMap, batchArgs.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -338,6 +467,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.insertParser.batchInsert(columnEngine.getTableName(), columnAliasMap, batchArgs.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -349,6 +479,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.insertParser.batchInsert(columnEngine.getTableName(), columnAliasMap, batchArgs.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -358,6 +489,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(model.getTableName(), columnAliasMap, records.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArrayRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -367,6 +499,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(tableName, columnAliasMap, records.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArrayRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -376,6 +509,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(model.getTableName(), columnAliasMap, records.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -385,6 +519,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.insertParser.batchInsert(tableName, columnAliasMap, records.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -396,6 +531,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.insertParser.batchInsert(columnEngine.getTableName(), columnAliasMap, records.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArrayRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -407,6 +543,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.insertParser.batchInsert(columnEngine.getTableName(), columnAliasMap, records.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -415,6 +552,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Object[] args, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.updateParser.updateByPrimaryKey(model.getTableName(), model.getPrimaryKeyName(), model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
         return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
     }
 
@@ -423,6 +561,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Object[] args, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.updateParser.updateByPrimaryKey(tableName, model.getPrimaryKeyName(), model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
         return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
     }
 
@@ -431,6 +570,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Collection<?> args, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.updateParser.updateByPrimaryKey(model.getTableName(), model.getPrimaryKeyName(), model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
         return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
     }
 
@@ -439,6 +579,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Collection<?> args, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.updateParser.updateByPrimaryKey(tableName, model.getPrimaryKeyName(), model.getColumnAliasMap());
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
         return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
     }
 
@@ -450,6 +591,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.updateParser.updateByPrimaryKey(columnEngine.getTableName(), columnEngine.getPrimaryKeyName(), columnAliasMap);
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
         return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
     }
 
@@ -461,6 +603,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.updateParser.updateByPrimaryKey(columnEngine.getTableName(), columnEngine.getPrimaryKeyName(), columnAliasMap);
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
         return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
     }
 
@@ -468,36 +611,48 @@ public class SpringJdbcEngine implements JdbcEngine {
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Map<String, ?> record, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateMapByPrimaryKey(model.getTableName(),
+        ParseData data = this.updateParser.updateMapByPrimaryKey(model.getTableName(),
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Object record, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateObjectByPrimaryKey(model.getTableName(),
+        ParseData data = this.updateParser.updateObjectByPrimaryKey(model.getTableName(),
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Map<String, ?> record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateMapByPrimaryKey(tableName,
+        ParseData data = this.updateParser.updateMapByPrimaryKey(tableName,
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Object record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateObjectByPrimaryKey(tableName,
+        ParseData data = this.updateParser.updateObjectByPrimaryKey(tableName,
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -507,9 +662,12 @@ public class SpringJdbcEngine implements JdbcEngine {
         if (columnAliasMap.size() == 0) {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
-        ParseData parseData = this.updateParser.updateMapByPrimaryKey(columnEngine.getTableName(),
+        ParseData data = this.updateParser.updateMapByPrimaryKey(columnEngine.getTableName(),
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -519,45 +677,60 @@ public class SpringJdbcEngine implements JdbcEngine {
         if (columnAliasMap.size() == 0) {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
-        ParseData parseData = this.updateParser.updateObjectByPrimaryKey(columnEngine.getTableName(),
+        ParseData data = this.updateParser.updateObjectByPrimaryKey(columnEngine.getTableName(),
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Map<String, ?> record, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateMapByPrimaryKeySelective(model.getTableName(),
+        ParseData data = this.updateParser.updateMapByPrimaryKeySelective(model.getTableName(),
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Map<String, ?> record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateMapByPrimaryKeySelective(tableName,
+        ParseData data = this.updateParser.updateMapByPrimaryKeySelective(tableName,
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Object record, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateObjectByPrimaryKeySelective(model.getTableName(),
+        ParseData data = this.updateParser.updateObjectByPrimaryKeySelective(model.getTableName(),
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Object record, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.updateObjectByPrimaryKeySelective(tableName,
+        ParseData data = this.updateParser.updateObjectByPrimaryKeySelective(tableName,
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -567,9 +740,12 @@ public class SpringJdbcEngine implements JdbcEngine {
         if (columnAliasMap.size() == 0) {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
-        ParseData parseData = this.updateParser.updateMapByPrimaryKeySelective(columnEngine.getTableName(),
+        ParseData data = this.updateParser.updateMapByPrimaryKeySelective(columnEngine.getTableName(),
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -579,81 +755,114 @@ public class SpringJdbcEngine implements JdbcEngine {
         if (columnAliasMap.size() == 0) {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
-        ParseData parseData = this.updateParser.updateObjectByPrimaryKeySelective(columnEngine.getTableName(),
+        ParseData data = this.updateParser.updateObjectByPrimaryKeySelective(columnEngine.getTableName(),
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     public int updateRecord(Map<String, ?> record, WhereEngine whereEngine) {
-        ParseData parseData = this.updateParser.updateMap(record, whereEngine);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        ParseData data = this.updateParser.updateMap(record, whereEngine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     public int updateRecord(Object record, WhereEngine whereEngine) {
-        ParseData parseData = this.updateParser.updateObject(record, whereEngine);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        ParseData data = this.updateParser.updateObject(record, whereEngine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     public int updateRecordSelective(Map<String, ?> record, WhereEngine whereEngine) {
-        ParseData parseData = this.updateParser.updateMapSelective(record, whereEngine);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        ParseData data = this.updateParser.updateMapSelective(record, whereEngine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     public int updateRecordSelective(Object record, WhereEngine whereEngine) {
-        ParseData parseData = this.updateParser.updateObjectSelective(record, whereEngine);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        ParseData data = this.updateParser.updateObjectSelective(record, whereEngine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(model.getTableName(),
+        ParseData data = this.updateParser.batchUpdateByPrimaryKeys(model.getTableName(),
                 model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(tableName,
+        ParseData data = this.updateParser.batchUpdateByPrimaryKeys(tableName,
                 model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(model.getTableName(),
+        ParseData data = this.updateParser.batchUpdateByPrimaryKeys(model.getTableName(),
                 model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
-        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(tableName,
+        ParseData data = this.updateParser.batchUpdateByPrimaryKeys(tableName,
                 model.getPrimaryKeyName(), model.getPrimaryKeyAlias(), model.getColumnAliasMap(), records);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     public int batchUpdateRecordsByPrimaryKeys(Object[] records, WhereEngine whereEngine) {
-        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(records, whereEngine);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        ParseData data = this.updateParser.batchUpdateByPrimaryKeys(records, whereEngine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
     public int batchUpdateRecordsByPrimaryKeys(Collection<?> records, WhereEngine whereEngine) {
-        ParseData parseData = this.updateParser.batchUpdateByPrimaryKeys(records, whereEngine);
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        ParseData data = this.updateParser.batchUpdateByPrimaryKeys(records, whereEngine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     @Override
@@ -662,6 +871,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(model.getTableName(), columnAliasMap, batchArgs.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -671,6 +881,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(tableName, columnAliasMap, batchArgs.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -680,6 +891,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(model.getTableName(), columnAliasMap, batchArgs.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -689,6 +901,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(tableName, columnAliasMap, batchArgs.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -700,6 +913,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.updateOrInsertParser.updateOrInsert(columnEngine.getTableName(), columnAliasMap, batchArgs.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -711,6 +925,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.updateOrInsertParser.updateOrInsert(columnEngine.getTableName(), columnAliasMap, batchArgs.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
@@ -720,6 +935,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(model.getTableName(), columnAliasMap, records.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArrayRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -729,6 +945,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(tableName, columnAliasMap, records.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArrayRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -738,6 +955,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(model.getTableName(), columnAliasMap, records.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -747,6 +965,7 @@ public class SpringJdbcEngine implements JdbcEngine {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
         String sql = this.updateOrInsertParser.updateOrInsert(tableName, columnAliasMap, records.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -758,6 +977,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.updateOrInsertParser.updateOrInsert(columnEngine.getTableName(), columnAliasMap, records.length);
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchArrayRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -769,6 +989,7 @@ public class SpringJdbcEngine implements JdbcEngine {
             columnAliasMap = columnEngine.getTable().getColumnAliasMap();
         }
         String sql = this.updateOrInsertParser.updateOrInsert(columnEngine.getTableName(), columnAliasMap, records.size());
+        printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
     }
 
@@ -776,6 +997,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int deleteByPrimaryKey(Object keyValue, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.deleteParser.deleteByPrimaryKey(model.getTableName(), model.getPrimaryKeyName());
+        printPrecompileSqlAndArgs(sql, null, keyValue, null);
         return this.jdbcTemplate.update(sql, keyValue);
     }
 
@@ -783,6 +1005,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int deleteByPrimaryKey(Object keyValue, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.deleteParser.deleteByPrimaryKey(tableName, model.getPrimaryKeyName());
+        printPrecompileSqlAndArgs(sql, null, keyValue, null);
         return this.jdbcTemplate.update(sql, keyValue);
     }
 
@@ -790,6 +1013,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.deleteParser.batchDeleteByPrimaryKeys(model.getTableName(), model.getPrimaryKeyName(), keyValues.length);
+        printPrecompileSqlAndArgs(sql, null, keyValues, null);
         return this.jdbcTemplate.update(sql, keyValues);
     }
 
@@ -797,6 +1021,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.deleteParser.batchDeleteByPrimaryKeys(tableName, model.getPrimaryKeyName(), keyValues.length);
+        printPrecompileSqlAndArgs(sql, null, keyValues, null);
         return this.jdbcTemplate.update(sql, keyValues);
     }
 
@@ -804,6 +1029,7 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.deleteParser.batchDeleteByPrimaryKeys(model.getTableName(), model.getPrimaryKeyName(), keyValues.size());
+        printPrecompileSqlAndArgs(sql, null, keyValues, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(keyValues));
     }
 
@@ -811,14 +1037,17 @@ public class SpringJdbcEngine implements JdbcEngine {
     public <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, String tableName, Class<T> modelClass) {
         Model model = newModel(modelClass);
         String sql = this.deleteParser.batchDeleteByPrimaryKeys(tableName, model.getPrimaryKeyName(), keyValues.size());
+        printPrecompileSqlAndArgs(sql, null, keyValues, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(keyValues));
     }
 
     @Override
     public int delete(WhereEngine whereEngine) {
-        ParseData parseData = this.deleteParser.delete(whereEngine);
-        System.out.println(parseData.getSql());
-        return this.jdbcTemplate.update(parseData.getSql(), new CollectionArgumentPreparedStatementSetter(parseData.getArgs()));
+        ParseData data = this.deleteParser.delete(whereEngine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {

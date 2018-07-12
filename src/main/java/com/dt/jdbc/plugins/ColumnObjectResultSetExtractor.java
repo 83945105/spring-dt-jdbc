@@ -1,5 +1,7 @@
 package com.dt.jdbc.plugins;
 
+import com.dt.beans.ClassAccessCache;
+import com.esotericsoftware.reflectasm.FieldAccess;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -13,79 +15,81 @@ import java.util.Map;
 /**
  * Created by 白超 on 2018/7/3.
  */
-public final class PairColumnResultSetExtractor<K, V> implements ResultSetExtractor<Map<K, V>> {
+public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtractor<Map<K, T>> {
 
     //0 => index mode 1 => name mode
     private int mode = 0;
 
     private int keyIndex = 1;
 
-    private int valueIndex = 2;
-
     private String keyColumnName;
 
-    private String valueColumnName;
+    private Class<T> valueType;
 
-    public PairColumnResultSetExtractor() {
-    }
+    private ClassAccessCache classAccessCache = new ClassAccessCache();
 
-    public PairColumnResultSetExtractor(int keyIndex, int valueIndex) {
+    public ColumnObjectResultSetExtractor(int keyIndex, Class<T> valueType) {
         this.keyIndex = keyIndex;
-        this.valueIndex = valueIndex;
+        this.valueType = valueType;
     }
 
-    public PairColumnResultSetExtractor(String keyColumnName, String valueColumnName) {
+    public ColumnObjectResultSetExtractor(String keyColumnName, Class<T> valueType) {
         this.keyColumnName = keyColumnName;
-        this.valueColumnName = valueColumnName;
         this.mode = 1;
+        this.valueType = valueType;
     }
 
     @Override
-    public Map<K, V> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        Map<K, V> result = new LinkedHashMap<>();
+    public Map<K, T> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        Map<K, T> result = new LinkedHashMap<>();
         Object key;
-        Object value;
+        T value = null;
         if (mode == 0) {
+            String name;
+            FieldAccess fieldAccess = this.classAccessCache.getFieldAccess(this.valueType);
             while (rs.next()) {
                 key = null;
-                value = null;
+                try {
+                    value = this.valueType.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 if (this.keyIndex <= columnCount) {
                     key = this.getColumnValue(rs, this.keyIndex);
                 }
-                if (this.valueIndex <= columnCount) {
-                    value = this.getColumnValue(rs, this.valueIndex);
+                for (int i = 1; i <= columnCount; i++) {
+                    name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
+                    fieldAccess.set(value, name, this.getColumnValue(rs, i));
                 }
-                result.put((K) key, (V) value);
+                result.put((K) key, value);
             }
         } else if (mode == 1) {
             String name;
+            FieldAccess fieldAccess = this.classAccessCache.getFieldAccess(this.valueType);
             while (rs.next()) {
                 key = null;
-                value = null;
+                try {
+                    value = this.valueType.newInstance();
+                } catch (InstantiationException | IllegalAccessException e) {
+                    e.printStackTrace();
+                }
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
                     name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
                     if (name.equals(keyColumnName)) {
                         key = getColumnValue(rs, i);
-                        if (value != null) {
-                            break;
-                        }
                     }
-                    if (name.equals(valueColumnName)) {
-                        value = getColumnValue(rs, i);
-                        if (key != null) {
-                            break;
-                        }
-                    }
+                    fieldAccess.set(value, name, this.getColumnValue(rs, i));
                 }
-                result.put((K) key, (V) value);
+                result.put((K) key, value);
             }
         }
         return result;
     }
+
 
     private String getColumnKey(String columnName) {
         return columnName;

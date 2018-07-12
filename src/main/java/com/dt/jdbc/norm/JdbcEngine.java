@@ -64,10 +64,10 @@ public interface JdbcEngine {
     default <T> PageResult<T> pageQueryForList(Class<T> returnType, int currentPage, int pageSize, LimitEngine engine) {
         int count = this.queryCount(engine);
         PageSupport pageSupport = new PageSupport(count, currentPage, pageSize);
-        PageResult pageResult = new PageResult();
+        PageResult<T> pageResult = new PageResult<>();
         pageResult.setLimit(pageSupport);
         if (count == 0) {
-            pageResult.setObjectList(new ArrayList());
+            pageResult.setObjectList(new ArrayList<>());
             return pageResult;
         }
         engine.limit(pageSupport.getLimitStart(), pageSupport.getLimitEnd());
@@ -80,6 +80,14 @@ public interface JdbcEngine {
     <K, V> Map<K, V> queryPairColumnInMap(int keyIndex, int valueIndex, Engine engine);
 
     <K, V> Map<K, V> queryPairColumnInMap(String keyColumnName, String valueColumnName, Engine engine);
+
+    <K> Map<K, Map<String, Object>> queryForListInMap(int keyIndex, Engine engine);
+
+    <K> Map<K, Map<String, Object>> queryForListInMap(String keyColumnName, Engine engine);
+
+    <K, T> Map<K, T> queryForListInMap(int keyIndex, Class<T> returnType, Engine engine);
+
+    <K, T> Map<K, T> queryForListInMap(String keyColumnName, Class<T> returnType, Engine engine);
 
     /**
      * 不推荐使用

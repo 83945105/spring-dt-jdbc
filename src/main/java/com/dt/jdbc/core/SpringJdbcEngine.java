@@ -216,6 +216,46 @@ public final class SpringJdbcEngine implements JdbcEngine {
     }
 
     @Override
+    public <K> Map<K, Map<String, Object>> queryForListInMap(int keyIndex, Engine engine) {
+        ParseData data = this.queryParser.selectList(engine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new ColumnMapResultSetExtractor<K>(keyIndex));
+    }
+
+    @Override
+    public <K> Map<K, Map<String, Object>> queryForListInMap(String keyColumnName, Engine engine) {
+        ParseData data = this.queryParser.selectList(engine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new ColumnMapResultSetExtractor<K>(keyColumnName));
+    }
+
+    @Override
+    public <K, T> Map<K, T> queryForListInMap(int keyIndex, Class<T> returnType, Engine engine) {
+        ParseData data = this.queryParser.selectList(engine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new ColumnObjectResultSetExtractor<K, T>(keyIndex, returnType));
+    }
+
+    @Override
+    public <K, T> Map<K, T> queryForListInMap(String keyColumnName, Class<T> returnType, Engine engine) {
+        ParseData data = this.queryParser.selectList(engine);
+        String sql = data.getSql();
+        List<Object> args = data.getArgs();
+        printPrecompileSqlAndArgs(sql, null, args, null);
+        return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
+                new ColumnObjectResultSetExtractor<K, T>(keyColumnName, returnType));
+    }
+
+    @Override
     @SuppressWarnings("unchecked")
     public <T extends Model> int insertArgs(Object[] args, Class<T> modelClass) {
         Model model = newModel(modelClass);

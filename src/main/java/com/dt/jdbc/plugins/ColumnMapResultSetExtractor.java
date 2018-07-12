@@ -7,85 +7,72 @@ import org.springframework.jdbc.support.JdbcUtils;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
  * Created by 白超 on 2018/7/3.
  */
-public final class PairColumnResultSetExtractor<K, V> implements ResultSetExtractor<Map<K, V>> {
+public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<Map<K, Map<String, Object>>> {
 
     //0 => index mode 1 => name mode
     private int mode = 0;
 
     private int keyIndex = 1;
 
-    private int valueIndex = 2;
-
     private String keyColumnName;
 
-    private String valueColumnName;
-
-    public PairColumnResultSetExtractor() {
-    }
-
-    public PairColumnResultSetExtractor(int keyIndex, int valueIndex) {
+    public ColumnMapResultSetExtractor(int keyIndex) {
         this.keyIndex = keyIndex;
-        this.valueIndex = valueIndex;
     }
 
-    public PairColumnResultSetExtractor(String keyColumnName, String valueColumnName) {
+    public ColumnMapResultSetExtractor(String keyColumnName) {
         this.keyColumnName = keyColumnName;
-        this.valueColumnName = valueColumnName;
         this.mode = 1;
     }
 
     @Override
-    public Map<K, V> extractData(ResultSet rs) throws SQLException, DataAccessException {
-        Map<K, V> result = new LinkedHashMap<>();
+    public Map<K, Map<String, Object>> extractData(ResultSet rs) throws SQLException, DataAccessException {
+        Map<K, Map<String, Object>> result = new LinkedHashMap<>();
         Object key;
-        Object value;
+        Map<String, Object> value;
         if (mode == 0) {
+            String name;
             while (rs.next()) {
                 key = null;
-                value = null;
+                value = new HashMap<>();
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 if (this.keyIndex <= columnCount) {
                     key = this.getColumnValue(rs, this.keyIndex);
                 }
-                if (this.valueIndex <= columnCount) {
-                    value = this.getColumnValue(rs, this.valueIndex);
+                for (int i = 1; i <= columnCount; i++) {
+                    name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
+                    value.put(name, this.getColumnValue(rs, i));
                 }
-                result.put((K) key, (V) value);
+                result.put((K) key, value);
             }
         } else if (mode == 1) {
             String name;
             while (rs.next()) {
                 key = null;
-                value = null;
+                value = new HashMap<>();
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
                     name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
                     if (name.equals(keyColumnName)) {
                         key = getColumnValue(rs, i);
-                        if (value != null) {
-                            break;
-                        }
                     }
-                    if (name.equals(valueColumnName)) {
-                        value = getColumnValue(rs, i);
-                        if (key != null) {
-                            break;
-                        }
-                    }
+                    value.put(name, this.getColumnValue(rs, i));
                 }
-                result.put((K) key, (V) value);
+                result.put((K) key, value);
             }
         }
         return result;
     }
+
 
     private String getColumnKey(String columnName) {
         return columnName;

@@ -1,7 +1,8 @@
 package com.dt.jdbc.plugins;
 
+import com.dt.beans.BeanUtils;
 import com.dt.beans.ClassAccessCache;
-import com.esotericsoftware.reflectasm.FieldAccess;
+import com.esotericsoftware.reflectasm.MethodAccess;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -46,7 +47,7 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
         T value = null;
         if (mode == 0) {
             String name;
-            FieldAccess fieldAccess = this.classAccessCache.getFieldAccess(this.valueType);
+            MethodAccess methodAccess = this.classAccessCache.getMethodAccess(this.valueType);
             while (rs.next()) {
                 key = null;
                 try {
@@ -61,13 +62,13 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
                 }
                 for (int i = 1; i <= columnCount; i++) {
                     name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
-                    fieldAccess.set(value, name, this.getColumnValue(rs, i));
+                    methodAccess.invoke(value, BeanUtils.getSetterMethodName(name), this.getColumnValue(rs, i));
                 }
                 result.put((K) key, value);
             }
         } else if (mode == 1) {
             String name;
-            FieldAccess fieldAccess = this.classAccessCache.getFieldAccess(this.valueType);
+            MethodAccess methodAccess = this.classAccessCache.getMethodAccess(this.valueType);
             while (rs.next()) {
                 key = null;
                 try {
@@ -82,14 +83,13 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
                     if (name.equals(keyColumnName)) {
                         key = getColumnValue(rs, i);
                     }
-                    fieldAccess.set(value, name, this.getColumnValue(rs, i));
+                    methodAccess.invoke(value, BeanUtils.getSetterMethodName(name), this.getColumnValue(rs, i));
                 }
                 result.put((K) key, value);
             }
         }
         return result;
     }
-
 
     private String getColumnKey(String columnName) {
         return columnName;

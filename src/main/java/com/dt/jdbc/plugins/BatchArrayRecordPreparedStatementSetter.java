@@ -58,9 +58,7 @@ public final class BatchArrayRecordPreparedStatementSetter implements PreparedSt
 
     @Override
     public void cleanupParameters() {
-        if (this.recordArray != null) {
-            this.recordArray = null;
-        }
+        //不清空
     }
 
     public void setCache(ClassAccessCache cache) {

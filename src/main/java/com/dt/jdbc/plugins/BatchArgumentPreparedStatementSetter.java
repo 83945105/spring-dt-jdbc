@@ -105,12 +105,7 @@ public final class BatchArgumentPreparedStatementSetter implements PreparedState
 
     @Override
     public void cleanupParameters() {
-        if (this.argsArray != null) {
-            this.argsArray = null;
-        }
-        if (this.argsCollection != null) {
-            this.argsCollection.clear();
-        }
+        //不清空
     }
 
 }

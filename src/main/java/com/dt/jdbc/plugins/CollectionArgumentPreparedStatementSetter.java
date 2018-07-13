@@ -42,6 +42,6 @@ public final class CollectionArgumentPreparedStatementSetter implements Prepared
 
     @Override
     public void cleanupParameters() {
-        this.args.clear();
+        //不清空
     }
 }

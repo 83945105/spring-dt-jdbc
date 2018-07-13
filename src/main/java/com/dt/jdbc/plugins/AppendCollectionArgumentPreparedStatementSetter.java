@@ -56,6 +56,6 @@ public final class AppendCollectionArgumentPreparedStatementSetter implements Pr
 
     @Override
     public void cleanupParameters() {
-        StatementCreatorUtils.cleanupParameters(this.args);
+        //不清空
     }
 }

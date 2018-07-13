@@ -59,9 +59,7 @@ public final class BatchCollectionRecordPreparedStatementSetter implements Prepa
 
     @Override
     public void cleanupParameters() {
-        if (this.recordCollection != null) {
-            this.recordCollection.clear();
-        }
+        //不清空
     }
 
     public void setCache(ClassAccessCache cache) {

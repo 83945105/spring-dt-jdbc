@@ -20,8 +20,6 @@ public final class BatchArrayRecordPreparedStatementSetter implements PreparedSt
 
     private Map<String, String> columnAliasMap;
 
-    private ClassAccessCache cache = new ClassAccessCache();
-
     public BatchArrayRecordPreparedStatementSetter(Object[] recordArray, Map<String, String> columnAliasMap) {
         this.recordArray = recordArray;
         this.columnAliasMap = columnAliasMap;
@@ -38,7 +36,7 @@ public final class BatchArrayRecordPreparedStatementSetter implements PreparedSt
                         doSetValue(ps, i++ + 1, ((Map) record).get(entry.getKey()));
                     }
                 } else {
-                    methodAccess = this.cache.getMethodAccess(record.getClass());
+                    methodAccess = ClassAccessCache.getMethodAccess(record.getClass());
                     for (Map.Entry<String, String> entry : this.columnAliasMap.entrySet()) {
                         doSetValue(ps, i++ + 1, methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
                     }
@@ -61,7 +59,4 @@ public final class BatchArrayRecordPreparedStatementSetter implements PreparedSt
         //不清空
     }
 
-    public void setCache(ClassAccessCache cache) {
-        this.cache = cache;
-    }
 }

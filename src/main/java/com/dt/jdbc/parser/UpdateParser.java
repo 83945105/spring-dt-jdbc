@@ -20,8 +20,6 @@ import java.util.Map;
  */
 public class UpdateParser {
 
-    private ClassAccessCache cache = new ClassAccessCache();
-
     public String updateByPrimaryKey(String tableName, String primaryKeyName, Map<String, String> columnAliasMap) {
         StringBuilder sql = new StringBuilder(64);
         sql.append("update ")
@@ -89,7 +87,7 @@ public class UpdateParser {
 
     public ParseData updateObjectByPrimaryKey(String tableName, String primaryKeyName, Object primaryKeyValue, Map<String, String> columnAliasMap, Object record) {
         Class clazz = record.getClass();
-        MethodAccess methodAccess = this.cache.getMethodAccess(clazz);
+        MethodAccess methodAccess = ClassAccessCache.getMethodAccess(clazz);
         StringBuilder sql = new StringBuilder(64);
         ParseData parseData = new ParseData();
         List<Object> args = new ArrayList<>();
@@ -113,7 +111,7 @@ public class UpdateParser {
 
     public ParseData updateObjectByPrimaryKeySelective(String tableName, String primaryKeyName, Object primaryKeyValue, Map<String, String> columnAliasMap, Object record) {
         Class clazz = record.getClass();
-        MethodAccess methodAccess = this.cache.getMethodAccess(clazz);
+        MethodAccess methodAccess = ClassAccessCache.getMethodAccess(clazz);
         StringBuilder sql = new StringBuilder(64);
         ParseData parseData = new ParseData();
         List<Object> args = new ArrayList<>();
@@ -183,7 +181,7 @@ public class UpdateParser {
     @SuppressWarnings("unchecked")
     public ParseData updateObject(Object record, WhereEngine whereEngine) {
         Class clazz = record.getClass();
-        MethodAccess methodAccess = this.cache.getMethodAccess(clazz);
+        MethodAccess methodAccess = ClassAccessCache.getMethodAccess(clazz);
         StringBuilder sql = new StringBuilder(64);
         ParseData parseData;
         List<Object> args = new ArrayList<>();
@@ -271,7 +269,7 @@ public class UpdateParser {
     @SuppressWarnings("unchecked")
     public ParseData updateObjectSelective(Object record, WhereEngine whereEngine) {
         Class clazz = record.getClass();
-        MethodAccess methodAccess = this.cache.getMethodAccess(clazz);
+        MethodAccess methodAccess = ClassAccessCache.getMethodAccess(clazz);
         StringBuilder sql = new StringBuilder(64);
         ParseData parseData;
         List<Object> args = new ArrayList<>();
@@ -346,7 +344,7 @@ public class UpdateParser {
                 }
             } else {
                 Class clazz = record.getClass();
-                methodAccess = this.cache.getMethodAccess(clazz);
+                methodAccess = ClassAccessCache.getMethodAccess(clazz);
                 keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
                 if (i++ != 0) {
                     in.append(",");
@@ -415,7 +413,7 @@ public class UpdateParser {
                 }
             } else {
                 Class clazz = record.getClass();
-                methodAccess = this.cache.getMethodAccess(clazz);
+                methodAccess = ClassAccessCache.getMethodAccess(clazz);
                 keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
                 if (i++ != 0) {
                     in.append(",");
@@ -498,7 +496,7 @@ public class UpdateParser {
                 }
             } else {
                 Class clazz = record.getClass();
-                methodAccess = this.cache.getMethodAccess(clazz);
+                methodAccess = ClassAccessCache.getMethodAccess(clazz);
                 keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
                 if (i++ != 0) {
                     in.append(",");
@@ -589,7 +587,7 @@ public class UpdateParser {
                 }
             } else {
                 Class clazz = record.getClass();
-                methodAccess = this.cache.getMethodAccess(clazz);
+                methodAccess = ClassAccessCache.getMethodAccess(clazz);
                 keyValue = methodAccess.invoke(record, BeanUtils.getGetterMethodName(primaryKeyAlias, false));
                 if (i++ != 0) {
                     in.append(",");
@@ -637,8 +635,4 @@ public class UpdateParser {
         return parseData;
     }
 
-    @SuppressWarnings("unused")
-    public void setCache(ClassAccessCache cache) {
-        this.cache = cache;
-    }
 }

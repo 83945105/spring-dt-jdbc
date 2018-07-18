@@ -132,7 +132,8 @@ public final class SpringJdbcEngine implements JdbcEngine {
     public <T> T queryByPrimaryKey(Object keyValue, Class<T> returnType, ColumnEngine columnEngine) {
         String sql = this.queryParser.selectByPrimaryKey(columnEngine);
         printPrecompileSqlAndArgs(sql, null, keyValue, null);
-        return this.jdbcTemplate.queryForObject(sql, new Object[]{keyValue}, new BeanPropertyRowMapper<>(returnType));
+        List<T> results = this.jdbcTemplate.query(sql, new Object[]{keyValue}, new ListObjectResultSetExtractor<>(returnType, 1));
+        return DataAccessUtils.nullableSingleResult(results);
     }
 
     @Override
@@ -153,7 +154,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
         List<Object> args = data.getArgs();
         printPrecompileSqlAndArgs(sql, null, args, null);
         List<T> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
-                new RowMapperResultSetExtractor<>(new BeanPropertyRowMapper<>(returnType), 1));
+                new ListObjectResultSetExtractor<>(returnType, 1));
         return DataAccessUtils.nullableSingleResult(results);
     }
 
@@ -174,7 +175,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
         List<Object> args = data.getArgs();
         printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
-                new RowMapperResultSetExtractor<>(new BeanPropertyRowMapper<>(returnType)));
+                new ListObjectResultSetExtractor<>(returnType));
     }
 
     @Override

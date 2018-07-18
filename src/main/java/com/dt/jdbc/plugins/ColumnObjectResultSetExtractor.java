@@ -27,8 +27,6 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
 
     private Class<T> valueType;
 
-    private ClassAccessCache classAccessCache = new ClassAccessCache();
-
     public ColumnObjectResultSetExtractor(int keyIndex, Class<T> valueType) {
         this.keyIndex = keyIndex;
         this.valueType = valueType;
@@ -47,7 +45,7 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
         T value = null;
         if (mode == 0) {
             String name;
-            MethodAccess methodAccess = this.classAccessCache.getMethodAccess(this.valueType);
+            MethodAccess methodAccess = ClassAccessCache.getMethodAccess(this.valueType);
             while (rs.next()) {
                 key = null;
                 try {
@@ -68,7 +66,7 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
             }
         } else if (mode == 1) {
             String name;
-            MethodAccess methodAccess = this.classAccessCache.getMethodAccess(this.valueType);
+            MethodAccess methodAccess = ClassAccessCache.getMethodAccess(this.valueType);
             while (rs.next()) {
                 key = null;
                 try {

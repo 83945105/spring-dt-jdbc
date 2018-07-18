@@ -21,8 +21,6 @@ public final class BatchCollectionRecordPreparedStatementSetter implements Prepa
 
     private Map<String, String> columnAliasMap;
 
-    private ClassAccessCache cache = new ClassAccessCache();
-
     public BatchCollectionRecordPreparedStatementSetter(Collection<?> recordCollection, Map<String, String> columnAliasMap) {
         this.recordCollection = recordCollection;
         this.columnAliasMap = columnAliasMap;
@@ -39,7 +37,7 @@ public final class BatchCollectionRecordPreparedStatementSetter implements Prepa
                         doSetValue(ps, i++ + 1, ((Map) record).get(entry.getKey()));
                     }
                 } else {
-                    methodAccess = this.cache.getMethodAccess(record.getClass());
+                    methodAccess = ClassAccessCache.getMethodAccess(record.getClass());
                     for (Map.Entry<String, String> entry : this.columnAliasMap.entrySet()) {
                         doSetValue(ps, i++ + 1, methodAccess.invoke(record, BeanUtils.getGetterMethodName(entry.getValue(), false)));
                     }
@@ -62,7 +60,4 @@ public final class BatchCollectionRecordPreparedStatementSetter implements Prepa
         //不清空
     }
 
-    public void setCache(ClassAccessCache cache) {
-        this.cache = cache;
-    }
 }

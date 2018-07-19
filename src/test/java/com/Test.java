@@ -19,7 +19,7 @@ import java.util.*;
 public class Test {
 
     public void method1() throws SQLException {
-        JdbcSourceEngine engine = JdbcSourceEngine.newMySqlEngine("192.168.0.112",
+        JdbcSourceEngine engine = JdbcSourceEngine.newMySqlEngine("192.168.3.3",
                 "3306", "shiro-manager-spring", "root", "root");
 
         new ModelTemplateEngine(engine, new HumpConverter())
@@ -135,7 +135,7 @@ public class Test {
     public void method4() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("com.mysql.jdbc.Driver");
-        dataSource.setUrl("jdbc:mysql://192.168.0.112:3306/shiro-manager-spring?useSSL=false");
+        dataSource.setUrl("jdbc:mysql://192.168.3.3:3306/shiro-manager-spring?useSSL=false");
         dataSource.setUsername("root");
         dataSource.setPassword("root");
 
@@ -229,6 +229,6 @@ public class Test {
 
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {
 
-        new Test().method4();
+        new Test().method1();
     }
 }

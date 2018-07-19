@@ -656,7 +656,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -668,7 +668,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -680,7 +680,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -692,7 +692,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -707,7 +707,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -722,7 +722,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -734,7 +734,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -746,7 +746,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -758,7 +758,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -770,7 +770,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 model.getPrimaryKeyName(), keyValue, model.getColumnAliasMap(), record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -785,7 +785,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 
@@ -800,7 +800,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 columnEngine.getPrimaryKeyName(), keyValue, columnAliasMap, record);
         String sql = data.getSql();
         List<Object> args = data.getArgs();
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
+        printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
     }
 

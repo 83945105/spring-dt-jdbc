@@ -2,6 +2,7 @@ package com.dt.jdbc.plugins;
 
 import com.dt.beans.BeanUtils;
 import com.dt.beans.ClassAccessCache;
+import com.dt.jdbc.utils.JdbcTools;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -56,11 +57,11 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 if (this.keyIndex <= columnCount) {
-                    key = this.getColumnValue(rs, this.keyIndex);
+                    key = JdbcTools.getColumnValue(rs, this.keyIndex);
                 }
                 for (int i = 1; i <= columnCount; i++) {
-                    name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
-                    methodAccess.invoke(value, BeanUtils.getSetterMethodName(name), this.getColumnValue(rs, i));
+                    name = JdbcTools.getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
+                    BeanUtils.invokeSetter(methodAccess, value, name, JdbcTools.getColumnValue(rs, i));
                 }
                 result.put((K) key, value);
             }
@@ -77,11 +78,11 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
-                    name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
+                    name = JdbcTools.getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
                     if (name.equals(keyColumnName)) {
-                        key = getColumnValue(rs, i);
+                        key = JdbcTools.getColumnValue(rs, i);
                     }
-                    methodAccess.invoke(value, BeanUtils.getSetterMethodName(name), this.getColumnValue(rs, i));
+                    BeanUtils.invokeSetter(methodAccess, value, name, JdbcTools.getColumnValue(rs, i));
                 }
                 result.put((K) key, value);
             }
@@ -89,11 +90,4 @@ public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtr
         return result;
     }
 
-    private String getColumnKey(String columnName) {
-        return columnName;
-    }
-
-    private Object getColumnValue(ResultSet rs, int index) throws SQLException {
-        return JdbcUtils.getResultSetValue(rs, index);
-    }
 }

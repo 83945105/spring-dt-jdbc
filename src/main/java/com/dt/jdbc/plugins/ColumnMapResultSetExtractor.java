@@ -1,5 +1,6 @@
 package com.dt.jdbc.plugins;
 
+import com.dt.jdbc.utils.JdbcTools;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.support.JdbcUtils;
@@ -45,11 +46,11 @@ public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 if (this.keyIndex <= columnCount) {
-                    key = this.getColumnValue(rs, this.keyIndex);
+                    key = JdbcTools.getColumnValue(rs, this.keyIndex);
                 }
                 for (int i = 1; i <= columnCount; i++) {
-                    name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
-                    value.put(name, this.getColumnValue(rs, i));
+                    name = JdbcTools.getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
+                    value.put(name, JdbcTools.getColumnValue(rs, i));
                 }
                 result.put((K) key, value);
             }
@@ -61,11 +62,11 @@ public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {
-                    name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
+                    name = JdbcTools.getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
                     if (name.equals(keyColumnName)) {
-                        key = getColumnValue(rs, i);
+                        key = JdbcTools.getColumnValue(rs, i);
                     }
-                    value.put(name, this.getColumnValue(rs, i));
+                    value.put(name, JdbcTools.getColumnValue(rs, i));
                 }
                 result.put((K) key, value);
             }
@@ -73,12 +74,4 @@ public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<
         return result;
     }
 
-
-    private String getColumnKey(String columnName) {
-        return columnName;
-    }
-
-    private Object getColumnValue(ResultSet rs, int index) throws SQLException {
-        return JdbcUtils.getResultSetValue(rs, index);
-    }
 }

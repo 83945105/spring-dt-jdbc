@@ -2,6 +2,7 @@ package com.dt.jdbc.plugins;
 
 import com.dt.beans.BeanUtils;
 import com.dt.beans.ClassAccessCache;
+import com.dt.jdbc.utils.JdbcTools;
 import com.esotericsoftware.reflectasm.MethodAccess;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -114,20 +115,12 @@ public class ListObjectResultSetExtractor<T> implements ResultSetExtractor<List<
             ResultSetMetaData rsd = rs.getMetaData();
             int columnCount = rsd.getColumnCount();
             for (int i = 1; i <= columnCount; i++) {
-                name = getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
-                methodAccess.invoke(value, BeanUtils.getSetterMethodName(name), this.getColumnValue(rs, i));
+                name = JdbcTools.getColumnKey(JdbcUtils.lookupColumnName(rsd, i));
+                BeanUtils.invokeSetter(methodAccess, value, name, JdbcTools.getColumnValue(rs, i));
             }
             results.add(value);
         }
         return results;
-    }
-
-    private String getColumnKey(String columnName) {
-        return columnName;
-    }
-
-    private Object getColumnValue(ResultSet rs, int index) throws SQLException {
-        return JdbcUtils.getResultSetValue(rs, index);
     }
 
 }

@@ -8,12 +8,15 @@ import com.dt.core.norm.Model;
 import com.dt.jdbc.norm.JdbcEngine;
 import com.dt.jdbc.parser.*;
 import com.dt.jdbc.plugins.*;
+import com.dt.jdbc.utils.JdbcTools;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.fusesource.jansi.Ansi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.support.DataAccessUtils;
-import org.springframework.jdbc.core.*;
+import org.springframework.jdbc.core.ColumnMapRowMapper;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapperResultSetExtractor;
+import org.springframework.jdbc.core.SingleColumnRowMapper;
 
 import java.util.*;
 
@@ -133,7 +136,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
         String sql = this.queryParser.selectByPrimaryKey(columnEngine);
         printPrecompileSqlAndArgs(sql, null, keyValue, null);
         List<T> results = this.jdbcTemplate.query(sql, new Object[]{keyValue}, new ListObjectResultSetExtractor<>(returnType, 1));
-        return DataAccessUtils.nullableSingleResult(results);
+        return JdbcTools.nullableSingleResult(results);
     }
 
     @Override
@@ -144,7 +147,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
         printPrecompileSqlAndArgs(sql, null, args, null);
         List<Map<String, Object>> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
                 new RowMapperResultSetExtractor<>(new ColumnMapRowMapper(), 1));
-        return DataAccessUtils.nullableSingleResult(results);
+        return JdbcTools.nullableSingleResult(results);
     }
 
     @Override
@@ -155,7 +158,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
         printPrecompileSqlAndArgs(sql, null, args, null);
         List<T> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
                 new ListObjectResultSetExtractor<>(returnType, 1));
-        return DataAccessUtils.nullableSingleResult(results);
+        return JdbcTools.nullableSingleResult(results);
     }
 
     @Override
@@ -186,7 +189,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
         printPrecompileSqlAndArgs(sql, null, args, null);
         List<Integer> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
                 new RowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(Integer.class), 1));
-        return DataAccessUtils.nullableSingleResult(results);
+        return JdbcTools.nullableSingleResult(results);
     }
 
     @Override

@@ -121,7 +121,8 @@ public final class SpringJdbcEngine implements JdbcEngine {
     public boolean isTableExist(String tableName) {
         String sql = "select count(*) from information_schema.TABLES where table_name = '" + tableName + "'";
         printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.queryForObject(sql, Integer.class) > 0;
+        Integer count = this.jdbcTemplate.queryForObject(sql, Integer.class);
+        return count == null || count > 0;
     }
 
     @Override

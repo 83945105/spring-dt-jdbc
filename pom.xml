@@ -46,6 +46,7 @@
         <spring-dt-core.version>0.0.1</spring-dt-core.version>
         <spring.version>5.0.4.RELEASE</spring.version>
         <druid.version>1.1.8</druid.version>
+        <com.alibaba.fastjson.version>1.2.7</com.alibaba.fastjson.version>
     </properties>
 
     <dependencies>
@@ -63,6 +64,11 @@
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>${druid.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>${com.alibaba.fastjson.version}</version>
         </dependency>
     </dependencies>
 

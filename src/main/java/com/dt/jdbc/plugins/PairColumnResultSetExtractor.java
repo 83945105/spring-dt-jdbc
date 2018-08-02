@@ -42,6 +42,7 @@ public final class PairColumnResultSetExtractor<K, V> implements ResultSetExtrac
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<K, V> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<K, V> result = new LinkedHashMap<>();
         Object key;

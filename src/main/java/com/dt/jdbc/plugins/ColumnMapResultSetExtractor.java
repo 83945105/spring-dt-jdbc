@@ -34,6 +34,7 @@ public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Map<K, Map<String, Object>> extractData(ResultSet rs) throws SQLException, DataAccessException {
         Map<K, Map<String, Object>> result = new LinkedHashMap<>();
         Object key;

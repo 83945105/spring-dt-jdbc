@@ -5,6 +5,7 @@ import com.dt.core.engine.MySqlEngine;
 import com.dt.core.jdbc.JdbcSourceEngine;
 import com.dt.core.model.ModelTemplateEngine;
 import com.dt.jdbc.core.SpringJdbcEngine;
+import com.shiro.model.JurRole;
 import com.shiro.model.JurRoleModel;
 import com.shiro.model.JurRoleUserModel;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -83,7 +84,7 @@ public class Test {
         engine.setJdbcTemplate(jdbcTemplate);
 
         Map<String, String> record;
-/*        JurRole role;*/
+        /*        JurRole role;*/
 
         List<String> args = new ArrayList<>();
         args.add(UUID.randomUUID().toString());
@@ -184,6 +185,10 @@ public class Test {
         record2.setDescription("64646");
         record2.setParentId("233");*/
 
+//        Map<String, Object> record = engine.queryByPrimaryKey("1024", MySqlEngine.column(JurRoleModel.class));
+//        JurRole record = engine.queryByPrimaryKey("1024", JurRole.class, MySqlEngine.column(JurRoleModel.class));
+        Map<String, Object> record = engine.queryPairColumnInMap("id", "parentId", MySqlEngine.main(JurRoleModel.class));
+
         int count = 1;
         long tt = 0;
         for (int i = 0; i < count; i++) {
@@ -229,6 +234,6 @@ public class Test {
 
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {
 
-        new Test().method1();
+        new Test().method5();
     }
 }

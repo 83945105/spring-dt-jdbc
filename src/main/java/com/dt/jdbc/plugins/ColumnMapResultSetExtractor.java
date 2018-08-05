@@ -13,11 +13,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Created by 白超 on 2018/7/3.
+ * @author 白超
+ * @date 2018/7/3
  */
 public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<Map<K, Map<String, Object>>> {
 
-    //0 => index mode 1 => name mode
+    /**
+     * index mode 1 => name mode
+     */
     private int mode = 0;
 
     private int keyIndex = 1;
@@ -43,7 +46,7 @@ public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<
             String name;
             while (rs.next()) {
                 key = null;
-                value = new HashMap<>();
+                value = new HashMap<>(16);
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 if (this.keyIndex <= columnCount) {
@@ -59,7 +62,7 @@ public final class ColumnMapResultSetExtractor<K> implements ResultSetExtractor<
             String name;
             while (rs.next()) {
                 key = null;
-                value = new HashMap<>();
+                value = new HashMap<>(16);
                 ResultSetMetaData rsd = rs.getMetaData();
                 int columnCount = rsd.getColumnCount();
                 for (int i = 1; i <= columnCount; i++) {

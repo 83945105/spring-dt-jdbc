@@ -15,11 +15,14 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * Created by 白超 on 2018/7/3.
+ * @author 白超
+ * @date 2018/7/3
  */
 public final class ColumnObjectResultSetExtractor<K, T> implements ResultSetExtractor<Map<K, T>> {
 
-    //0 => index mode 1 => name mode
+    /**
+     * index mode 1 => name mode
+     */
     private int mode = 0;
 
     private int keyIndex = 1;

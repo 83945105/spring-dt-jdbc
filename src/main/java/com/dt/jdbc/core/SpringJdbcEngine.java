@@ -190,7 +190,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
         printPrecompileSqlAndArgs(sql, null, args, null);
         List<Integer> results = this.jdbcTemplate.query(sql, new CollectionArgumentPreparedStatementSetter(args),
                 new RowMapperResultSetExtractor<>(new SingleColumnRowMapper<>(Integer.class), 1));
-        return JdbcTools.nullableSingleResult(results);
+        return JdbcTools.countSingleResult(results);
     }
 
     @Override

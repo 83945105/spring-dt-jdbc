@@ -7,7 +7,7 @@ package com.dt.jdbc.bean;
  * @version 1.0
  * @since 2018/7/10
  */
-public class PageSupport {
+public class Pagination {
 
     /**
      * 总记录数
@@ -34,15 +34,15 @@ public class PageSupport {
      */
     private int mySqlStartNo = -1;
 
-    public PageSupport() {
+    public Pagination() {
     }
 
-    public PageSupport(int currentPage, int pageSize) {
+    public Pagination(int currentPage, int pageSize) {
         this.setCurrentPage(currentPage);
         this.setPageSize(pageSize);
     }
 
-    public PageSupport(int total, int currentPage, int pageSize) {
+    public Pagination(int total, int currentPage, int pageSize) {
         this.setTotal(total);
         this.setCurrentPage(currentPage);
         this.setPageSize(pageSize);

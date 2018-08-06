@@ -3,12 +3,11 @@ package com.dt.jdbc.bean;
 /**
  * @author 白超
  * @version 1.0
- * @see
  * @since 2018/7/11
  */
 public abstract class AbstractPageResult {
 
-    protected Pagination pagination;
+    private Pagination pagination;
 
     public Pagination getPagination() {
         return pagination;

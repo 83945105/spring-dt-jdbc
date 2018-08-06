@@ -44,106 +44,97 @@ public class ListObjectResultSetExtractor<T> implements ResultSetExtractor<List<
     @SuppressWarnings("unchecked")
     public List<T> extractData(ResultSet rs) throws SQLException, DataAccessException {
         List<T> results = (this.rowsExpected > 0 ? new ArrayList<>(this.rowsExpected) : new ArrayList<>());
+        if (this.valueType == Object.class) {
+            while (rs.next()) {
+                results.add((T) rs.getObject(1));
+            }
+            return results;
+        }
         if (this.valueType == boolean.class || this.valueType == Boolean.class) {
             while (rs.next()) {
                 results.add((T) Boolean.valueOf(rs.getBoolean(1)));
             }
             return results;
         }
-
         if (this.valueType == byte.class || this.valueType == Byte.class) {
             while (rs.next()) {
                 results.add((T) Byte.valueOf(rs.getByte(1)));
             }
             return results;
         }
-
         if (this.valueType == short.class || this.valueType == Short.class) {
             while (rs.next()) {
                 results.add((T) Short.valueOf(rs.getShort(1)));
             }
             return results;
         }
-
         if (this.valueType == int.class || this.valueType == Integer.class) {
             while (rs.next()) {
                 results.add((T) Integer.valueOf(rs.getInt(1)));
             }
             return results;
         }
-
         if (this.valueType == long.class || this.valueType == Long.class) {
             while (rs.next()) {
                 results.add((T) Long.valueOf(rs.getLong(1)));
             }
             return results;
         }
-
         if (this.valueType == float.class || this.valueType == Float.class) {
             while (rs.next()) {
                 results.add((T) Float.valueOf(rs.getFloat(1)));
             }
             return results;
         }
-
         if (this.valueType == double.class || this.valueType == Double.class) {
             while (rs.next()) {
                 results.add((T) Double.valueOf(rs.getDouble(1)));
             }
             return results;
         }
-
         if (this.valueType == String.class) {
             while (rs.next()) {
                 results.add((T) rs.getString(1));
             }
             return results;
         }
-
         if (this.valueType == BigDecimal.class) {
             while (rs.next()) {
                 results.add((T) rs.getBigDecimal(1));
             }
             return results;
         }
-
         if (this.valueType == BigInteger.class) {
             while (rs.next()) {
                 results.add((T) TypeUtils.castToBigInteger(rs.getObject(1)));
             }
             return results;
         }
-
         if (this.valueType == Date.class) {
             while (rs.next()) {
                 results.add((T) TypeUtils.castToDate(rs.getObject(1)));
             }
             return results;
         }
-
         if (this.valueType == java.sql.Date.class) {
             while (rs.next()) {
                 results.add((T) rs.getDate(1));
             }
             return results;
         }
-
         if (this.valueType == java.sql.Timestamp.class) {
             while (rs.next()) {
                 results.add((T) rs.getTimestamp(1));
             }
             return results;
         }
-
         if (this.valueType.isEnum()) {
             while (rs.next()) {
                 results.add(TypeUtils.castToEnum(rs.getObject(1), this.valueType, ParserConfig.getGlobalInstance()));
             }
             return results;
         }
-
         //以上情况后续扩展
-
         //以下为正常实体类情况
         T value = null;
         String name;

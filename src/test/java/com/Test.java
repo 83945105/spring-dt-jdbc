@@ -1,12 +1,10 @@
 package com;
 
 import com.dt.core.converter.HumpConverter;
-import com.dt.core.data.ParseData;
 import com.dt.core.engine.MySqlEngine;
-import com.dt.core.jdbc.JdbcSourceEngine;
+import com.dt.core.jdbc.AbstractJdbcSourceEngine;
 import com.dt.core.model.ModelTemplateEngine;
 import com.dt.jdbc.core.SpringJdbcEngine;
-import com.shiro.model.JurRole;
 import com.shiro.model.JurRoleModel;
 import com.shiro.model.JurRoleUserModel;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -21,7 +19,7 @@ import java.util.*;
 public class Test {
 
     public void method1() throws SQLException {
-        JdbcSourceEngine engine = JdbcSourceEngine.newMySqlEngine("192.168.3.3",
+        AbstractJdbcSourceEngine engine = AbstractJdbcSourceEngine.newMySqlEngine("192.168.3.3",
                 "3306", "shiro-manager-spring", "root", "root");
 
         new ModelTemplateEngine(engine, new HumpConverter())
@@ -234,14 +232,8 @@ public class Test {
     }
 
     public void method6() {
-        String a = null;
-        ParseData parseData = MySqlEngine.main(JurRoleModel.class)
-                .where((condition, mainTable) -> condition
-                        .and((condition1, mainTable1) -> condition1
-                                .and(mainTable.id().equalTo(a))
-                                .or(mainTable.createTime().equalTo(a))))
-        .getWhereParseData();
-        System.out.println(parseData.getSql());
+        Class clazz = int.class;
+        System.out.println(clazz == Object.class);
     }
 
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {

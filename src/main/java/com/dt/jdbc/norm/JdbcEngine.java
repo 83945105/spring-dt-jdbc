@@ -763,12 +763,14 @@ public interface JdbcEngine {
 
     /**
      * 不推荐使用
+     * <p>根据主键更新参数
+     * <p>参数顺序需要对应列顺序
      *
-     * @param keyValue
-     * @param modelClass
-     * @param args
-     * @param <T>
-     * @return
+     * @param keyValue   主键值
+     * @param modelClass 生成的表模型类
+     * @param args       参数
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
      */
     default <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Class<T> modelClass, Object... args) {
         return this.updateArgsByPrimaryKey(keyValue, args, modelClass);
@@ -776,13 +778,15 @@ public interface JdbcEngine {
 
     /**
      * 不推荐使用
+     * <p>根据主键更新参数
+     * <p>参数顺序需要对应列顺序
      *
-     * @param keyValue
-     * @param tableName
-     * @param modelClass
-     * @param args
-     * @param <T>
-     * @return
+     * @param keyValue   主键值
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param args       参数
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
      */
     default <T extends Model> int updateArgsByPrimaryKey(Object keyValue, String tableName, Class<T> modelClass, Object... args) {
         return this.updateArgsByPrimaryKey(keyValue, args, tableName, modelClass);
@@ -790,182 +794,726 @@ public interface JdbcEngine {
 
     /**
      * 不推荐使用
+     * <p>根据主键更新参数
+     * <p>参数顺序需要对应列顺序
      *
-     * @param keyValue
-     * @param args
-     * @param modelClass
-     * @param <T>
-     * @return
+     * @param keyValue   主键值
+     * @param args       参数
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
      */
     <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Object[] args, Class<T> modelClass);
 
     /**
      * 不推荐使用
+     * <p>根据主键更新参数
+     * <p>参数顺序需要对应列顺序
      *
-     * @param keyValue
-     * @param args
-     * @param tableName
-     * @param modelClass
-     * @param <T>
-     * @return
+     * @param keyValue   主键值
+     * @param args       参数
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
      */
     <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Object[] args, String tableName, Class<T> modelClass);
 
     /**
      * 不推荐使用
+     * <p>根据主键更新参数
+     * <p>参数顺序需要对应列顺序
      *
-     * @param keyValue
-     * @param args
-     * @param modelClass
-     * @param <T>
-     * @return
+     * @param keyValue   主键值
+     * @param args       参数
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
      */
     <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Collection<?> args, Class<T> modelClass);
 
     /**
      * 不推荐使用
+     * <p>根据主键更新参数
+     * <p>参数顺序需要对应列顺序
      *
-     * @param keyValue
-     * @param args
-     * @param tableName
-     * @param modelClass
-     * @param <T>
-     * @return
+     * @param keyValue   主键值
+     * @param args       参数
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
      */
     <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Collection<?> args, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据主键更新指定字段
+     * <p>列顺序必须和参数顺序一致
+     *
+     * @param keyValue     主键值
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @param args         参数
+     * @return 影响的行数
+     */
     default int updateArgsByPrimaryKey(Object keyValue, ColumnEngine columnEngine, Object... args) {
         return this.updateArgsByPrimaryKey(keyValue, args, columnEngine);
     }
 
+    /**
+     * 根据主键更新指定字段
+     * <p>列顺序必须和参数顺序一致
+     *
+     * @param keyValue     主键值
+     * @param args         参数
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateArgsByPrimaryKey(Object keyValue, Object[] args, ColumnEngine columnEngine);
 
+    /**
+     * 根据主键更新指定字段
+     * <p>列顺序必须和参数顺序一致
+     *
+     * @param keyValue     主键值
+     * @param args         参数
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateArgsByPrimaryKey(Object keyValue, Collection<?> args, ColumnEngine columnEngine);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Map<String, ?> record, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Object record, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Map<String, ?> record, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKey(Object keyValue, Object record, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器对指定字段进行更新
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue     主键值
+     * @param record       数据容器
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecordByPrimaryKey(Object keyValue, Map<String, ?> record, ColumnEngine columnEngine);
 
+    /**
+     * 根据主键使用数据容器对指定字段进行更新
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue     主键值
+     * @param record       数据容器
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecordByPrimaryKey(Object keyValue, Object record, ColumnEngine columnEngine);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Map<String, ?> record, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Map<String, ?> record, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Object record, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器更新数据
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue   主键值
+     * @param record     数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateRecordByPrimaryKeySelective(Object keyValue, Object record, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据主键使用数据容器对指定字段进行更新
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue     主键值
+     * @param record       数据容器
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecordByPrimaryKeySelective(Object keyValue, Map<String, ?> record, ColumnEngine columnEngine);
 
+    /**
+     * 根据主键使用数据容器对指定字段进行更新
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param keyValue     主键值
+     * @param record       数据容器
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecordByPrimaryKeySelective(Object keyValue, Object record, ColumnEngine columnEngine);
 
+    /**
+     * 更新数据
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param record      数据容器
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecord(Map<String, ?> record, WhereEngine whereEngine);
 
+    /**
+     * 更新数据
+     * <p>数据容器属性如果为 {@code null},则属性对应列值也为 {@code null}
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param record      数据容器
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecord(Object record, WhereEngine whereEngine);
 
+    /**
+     * 更新数据
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param record      数据容器
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecordSelective(Map<String, ?> record, WhereEngine whereEngine);
 
+    /**
+     * 更新数据
+     * <p>数据容器属性如果为 {@code null},则不插入该属性对应列
+     * <p>数据容器与列名使用驼峰命名法进行映射
+     *
+     * @param record      数据容器
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateRecordSelective(Object record, WhereEngine whereEngine);
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param modelClass 生成的表模型类
+     * @param records    数据容器
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int batchUpdateRecordsByPrimaryKeys(Class<T> modelClass, Object... records) {
         return this.batchUpdateRecordsByPrimaryKeys(records, modelClass);
     }
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param records    数据容器
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int batchUpdateRecordsByPrimaryKeys(String tableName, Class<T> modelClass, Object... records) {
         return this.batchUpdateRecordsByPrimaryKeys(records, tableName, modelClass);
     }
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param records    数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, Class<T> modelClass);
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param records    数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchUpdateRecordsByPrimaryKeys(Object[] records, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param records    数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, Class<T> modelClass);
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param records    数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchUpdateRecordsByPrimaryKeys(Collection<?> records, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @param records     数据容器
+     * @return 影响的行数
+     */
     default int batchUpdateRecordsByPrimaryKeys(WhereEngine whereEngine, Object... records) {
         return this.batchUpdateRecordsByPrimaryKeys(records, whereEngine);
     }
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param records     数据容器
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int batchUpdateRecordsByPrimaryKeys(Object[] records, WhereEngine whereEngine);
 
+    /**
+     * 根据主键批量更新数据
+     * <p>数据容器对应的主键字段值不能为空
+     *
+     * @param records     数据容器
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int batchUpdateRecordsByPrimaryKeys(Collection<?> records, WhereEngine whereEngine);
 
+    /**
+     * 不推荐使用
+     * 根据参数更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param modelClass 生成的表模型类
+     * @param batchArgs  参数
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int updateOrInsertArgs(Class<T> modelClass, Object... batchArgs) {
         return this.updateOrInsertArgs(batchArgs, modelClass);
     }
 
+    /**
+     * 不推荐使用
+     * 根据参数更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param batchArgs  参数
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int updateOrInsertArgs(String tableName, Class<T> modelClass, Object... batchArgs) {
         return this.updateOrInsertArgs(batchArgs, tableName, modelClass);
     }
 
+    /**
+     * 不推荐使用
+     * 根据参数更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param batchArgs  参数
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertArgs(Object[] batchArgs, Class<T> modelClass);
 
+    /**
+     * 不推荐使用
+     * 根据参数更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param batchArgs  参数
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertArgs(Object[] batchArgs, String tableName, Class<T> modelClass);
 
+    /**
+     * 不推荐使用
+     * 根据参数更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param batchArgs  参数
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertArgs(Collection<?> batchArgs, Class<T> modelClass);
 
+    /**
+     * 不推荐使用
+     * 根据参数更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param batchArgs  参数
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertArgs(Collection<?> batchArgs, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据参数更新或插入指定列数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @param batchArgs    参数
+     * @return 影响的行数
+     */
     default int updateOrInsertArgs(ColumnEngine columnEngine, Object... batchArgs) {
         return this.updateOrInsertArgs(batchArgs, columnEngine);
     }
 
+    /**
+     * 根据参数更新或插入指定列数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param batchArgs    参数
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateOrInsertArgs(Object[] batchArgs, ColumnEngine columnEngine);
 
+    /**
+     * 根据参数更新或插入指定列数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为参数数组或参数集合
+     *
+     * @param batchArgs    参数
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateOrInsertArgs(Collection<?> batchArgs, ColumnEngine columnEngine);
 
+    /**
+     * 根据数据容器更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param modelClass 生成的表模型类
+     * @param records    数据容器
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int updateOrInsertRecord(Class<T> modelClass, Object... records) {
         return this.updateOrInsertRecord(records, modelClass);
     }
 
+    /**
+     * 根据数据容器更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param records    数据容器
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int updateOrInsertRecord(String tableName, Class<T> modelClass, Object... records) {
         return this.updateOrInsertRecord(records, tableName, modelClass);
     }
 
+    /**
+     * 根据数据容器更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param records    数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertRecord(Object[] records, Class<T> modelClass);
 
+    /**
+     * 根据数据容器更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param records    数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertRecord(Object[] records, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据数据容器更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param records    数据容器
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertRecord(Collection<?> records, Class<T> modelClass);
 
+    /**
+     * 根据数据容器更新或插入数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param records    数据容器
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int updateOrInsertRecord(Collection<?> records, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据数据容器更新或插入指定列数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @param records      数据容器
+     * @return 影响的行数
+     */
     default int updateOrInsertRecord(ColumnEngine columnEngine, Object... records) {
         return this.updateOrInsertRecord(records, columnEngine);
     }
 
+    /**
+     * 根据数据容器更新或插入指定列数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param records      数据容器
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateOrInsertRecord(Object[] records, ColumnEngine columnEngine);
 
+    /**
+     * 根据数据容器更新或插入指定列数据
+     * <p>数据存在执行更新,反之执行插入
+     * <p>每个参数为数据容器数组或数据容器集合
+     *
+     * @param records      数据容器
+     * @param columnEngine 用于构建查询SQL的字段引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int updateOrInsertRecord(Collection<?> records, ColumnEngine columnEngine);
 
+    /**
+     * 根据主键删除数据
+     *
+     * @param keyValue   主键值
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int deleteByPrimaryKey(Object keyValue, Class<T> modelClass);
 
+    /**
+     * 根据主键删除数据
+     *
+     * @param keyValue   主键值
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int deleteByPrimaryKey(Object keyValue, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据多个主键批量删除数据
+     *
+     * @param modelClass 生成的表模型类
+     * @param keyValues  主键值
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int batchDeleteByPrimaryKeys(Class<T> modelClass, Object... keyValues) {
         return this.batchDeleteByPrimaryKeys(keyValues, modelClass);
     }
 
+    /**
+     * 根据多个主键批量删除数据
+     *
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param keyValues  主键值
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     default <T extends Model> int batchDeleteByPrimaryKeys(String tableName, Class<T> modelClass, Object... keyValues) {
         return this.batchDeleteByPrimaryKeys(keyValues, tableName, modelClass);
     }
 
+    /**
+     * 根据多个主键批量删除数据
+     *
+     * @param keyValues  主键值
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, Class<T> modelClass);
 
+    /**
+     * 根据多个主键批量删除数据
+     *
+     * @param keyValues  主键值
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchDeleteByPrimaryKeys(Object[] keyValues, String tableName, Class<T> modelClass);
 
+    /**
+     * 根据多个主键批量删除数据
+     *
+     * @param keyValues  主键值
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, Class<T> modelClass);
 
+    /**
+     * 根据多个主键批量删除数据
+     *
+     * @param keyValues  主键值
+     * @param tableName  表名
+     * @param modelClass 生成的表模型类
+     * @param <T>        用于限定参数类型 {@link Model}
+     * @return 影响的行数
+     */
     <T extends Model> int batchDeleteByPrimaryKeys(Collection<?> keyValues, String tableName, Class<T> modelClass);
 
+    /**
+     * 删除数据
+     *
+     * @param whereEngine 用于构建查询SQL的条件引擎 {@link com.dt.core.engine.MySqlEngine}
+     * @return 影响的行数
+     */
     int delete(WhereEngine whereEngine);
 
 }

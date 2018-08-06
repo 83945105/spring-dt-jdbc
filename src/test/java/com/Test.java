@@ -1,6 +1,7 @@
 package com;
 
 import com.dt.core.converter.HumpConverter;
+import com.dt.core.data.ParseData;
 import com.dt.core.engine.MySqlEngine;
 import com.dt.core.jdbc.JdbcSourceEngine;
 import com.dt.core.model.ModelTemplateEngine;
@@ -232,8 +233,19 @@ public class Test {
         System.out.println(tt + " = " + tt / 1000000);
     }
 
+    public void method6() {
+        String a = null;
+        ParseData parseData = MySqlEngine.main(JurRoleModel.class)
+                .where((condition, mainTable) -> condition
+                        .and((condition1, mainTable1) -> condition1
+                                .and(mainTable.id().equalTo(a))
+                                .or(mainTable.createTime().equalTo(a))))
+        .getWhereParseData();
+        System.out.println(parseData.getSql());
+    }
+
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {
 
-        new Test().method5();
+        new Test().method6();
     }
 }

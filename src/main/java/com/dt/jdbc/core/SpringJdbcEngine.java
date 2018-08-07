@@ -91,7 +91,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
             }
             logger.debug(Ansi.ansi().eraseScreen()
                     .fg(Ansi.Color.RED)
-                    .a("precompile SQL args " + objects.toString())
+                    .a("Precompile SQL args " + objects.toString())
                     .reset());
             String[] sqlParts = sql.split("\\?");
             StringBuilder sb = new StringBuilder(sql.length() + objects.size() + 5);
@@ -101,8 +101,10 @@ public final class SpringJdbcEngine implements JdbcEngine {
                     value = objects.get(i);
                     if (value == null) {
                         sb.append(sqlParts[i]).append("null");
-                    } else {
+                    } else if (value instanceof String) {
                         sb.append(sqlParts[i]).append("'").append(value).append("'");
+                    } else {
+                        sb.append(sqlParts[i]).append(value);
                     }
                     continue;
                 }
@@ -110,7 +112,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
             }
             logger.debug(Ansi.ansi().eraseScreen()
                     .fg(Ansi.Color.GREEN)
-                    .a("execute SQL " + sb.toString())
+                    .a("Execute SQL " + sb.toString())
                     .reset());
         }
     }

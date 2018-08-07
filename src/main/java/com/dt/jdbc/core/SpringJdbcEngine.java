@@ -109,7 +109,7 @@ public final class SpringJdbcEngine implements JdbcEngine {
                 sb.append(sqlParts[i]);
             }
             logger.debug(Ansi.ansi().eraseScreen()
-                    .fg(Ansi.Color.RED)
+                    .fg(Ansi.Color.GREEN)
                     .a("execute SQL " + sb.toString())
                     .reset());
         }

@@ -231,13 +231,9 @@ public class Test {
         System.out.println(tt + " = " + tt / 1000000);
     }
 
-    public void method6() {
-        Class clazz = int.class;
-        System.out.println(clazz == Object.class);
-    }
 
     public static void main(String[] args) throws SQLException, InstantiationException, IllegalAccessException {
 
-        new Test().method6();
+        new Test().method5();
     }
 }

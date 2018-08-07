@@ -93,6 +93,21 @@ public final class SpringJdbcEngine implements JdbcEngine {
                     .fg(Ansi.Color.RED)
                     .a("precompile SQL args " + objects.toString())
                     .reset());
+            String[] sqlParts = sql.split("\\?");
+            StringBuilder sb = new StringBuilder(sql.length() + objects.size() + 5);
+            Object value;
+            for (int i = 0; i < sqlParts.length; i++) {
+                value = objects.get(i);
+                if (value == null) {
+                    sb.append(sqlParts[i]).append("null");
+                } else {
+                    sb.append(sqlParts[i]).append("'").append(value).append("'");
+                }
+            }
+            logger.debug(Ansi.ansi().eraseScreen()
+                    .fg(Ansi.Color.RED)
+                    .a("execute SQL " + sb.toString())
+                    .reset());
         }
     }
 

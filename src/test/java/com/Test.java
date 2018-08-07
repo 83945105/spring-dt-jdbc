@@ -2,7 +2,7 @@ package com;
 
 import com.dt.core.converter.HumpConverter;
 import com.dt.core.engine.MySqlEngine;
-import com.dt.core.jdbc.AbstractJdbcSourceEngine;
+import com.dt.core.jdbc.JdbcSourceEngine;
 import com.dt.core.model.ModelTemplateEngine;
 import com.dt.jdbc.core.SpringJdbcEngine;
 import com.shiro.model.JurRoleModel;
@@ -19,7 +19,7 @@ import java.util.*;
 public class Test {
 
     public void method1() throws SQLException {
-        AbstractJdbcSourceEngine engine = AbstractJdbcSourceEngine.newMySqlEngine("192.168.3.3",
+        JdbcSourceEngine engine = JdbcSourceEngine.newMySqlEngine("192.168.3.3",
                 "3306", "shiro-manager-spring", "root", "root");
 
         new ModelTemplateEngine(engine, new HumpConverter())

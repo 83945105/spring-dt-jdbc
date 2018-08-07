@@ -7,7 +7,7 @@ package com.dt.jdbc.bean;
  */
 public abstract class AbstractPageResult {
 
-    private Pagination pagination;
+    protected Pagination pagination;
 
     public Pagination getPagination() {
         return pagination;

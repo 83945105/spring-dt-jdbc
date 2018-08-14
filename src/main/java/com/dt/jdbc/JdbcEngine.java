@@ -1,4 +1,4 @@
-package com.dt.jdbc.norm;
+package com.dt.jdbc;
 
 import com.dt.core.engine.ColumnEngine;
 import com.dt.core.engine.LimitEngine;

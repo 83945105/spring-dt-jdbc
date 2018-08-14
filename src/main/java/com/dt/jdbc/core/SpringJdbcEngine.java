@@ -5,7 +5,7 @@ import com.dt.core.engine.ColumnEngine;
 import com.dt.core.engine.WhereEngine;
 import com.dt.core.norm.Engine;
 import com.dt.core.norm.Model;
-import com.dt.jdbc.norm.JdbcEngine;
+import com.dt.jdbc.JdbcEngine;
 import com.dt.jdbc.parser.*;
 import com.dt.jdbc.plugins.*;
 import com.dt.jdbc.utils.JdbcTools;

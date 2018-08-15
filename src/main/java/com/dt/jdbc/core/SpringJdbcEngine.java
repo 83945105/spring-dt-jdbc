@@ -283,42 +283,6 @@ public final class SpringJdbcEngine implements JdbcEngine {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Model> int insertArgs(Object[] args, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.insertParser.insert(model.getTableName(), model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, null);
-        return this.jdbcTemplate.update(sql, args);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int insertArgs(Object[] args, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.insertParser.insert(tableName, model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, null);
-        return this.jdbcTemplate.update(sql, args);
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int insertArgs(Collection<?> args, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.insertParser.insert(model.getTableName(), model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, null);
-        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int insertArgs(Collection<?> args, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.insertParser.insert(tableName, model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, null);
-        return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public int insertArgs(Object[] args, ColumnEngine columnEngine) {
         Map<String, String> columnAliasMap = columnEngine.getColumnAliasMap();
         if (columnAliasMap.size() == 0) {
@@ -487,70 +451,6 @@ public final class SpringJdbcEngine implements JdbcEngine {
 
     @Override
     @SuppressWarnings("unchecked")
-    public <T extends Model> int batchInsertArgs(Object[] batchArgs, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.insertParser.batchInsert(model.getTableName(), columnAliasMap, batchArgs.length);
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int batchInsertArgs(Object[] batchArgs, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.insertParser.batchInsert(tableName, columnAliasMap, batchArgs.length);
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int batchInsertArgs(Collection<?> batchArgs, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.insertParser.batchInsert(model.getTableName(), columnAliasMap, batchArgs.size());
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int batchInsertArgs(Collection<?> batchArgs, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.insertParser.batchInsert(tableName, columnAliasMap, batchArgs.size());
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public int batchInsertArgs(Object[] batchArgs, ColumnEngine columnEngine) {
-        Map<String, String> columnAliasMap = columnEngine.getColumnAliasMap();
-        if (columnAliasMap.size() == 0) {
-            columnAliasMap = columnEngine.getTable().getColumnAliasMap();
-        }
-        String sql = this.insertParser.batchInsert(columnEngine.getTableName(), columnAliasMap, batchArgs.length);
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public int batchInsertArgs(Collection<?> batchArgs, ColumnEngine columnEngine) {
-        Map<String, String> columnAliasMap = columnEngine.getColumnAliasMap();
-        if (columnAliasMap.size() == 0) {
-            columnAliasMap = columnEngine.getTable().getColumnAliasMap();
-        }
-        String sql = this.insertParser.batchInsert(columnEngine.getTableName(), columnAliasMap, batchArgs.size());
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
     public <T extends Model> int batchInsertRecords(Object[] records, Class<T> modelClass) {
         Model model = newModel(modelClass);
         Map<String, String> columnAliasMap = model.getColumnAliasMap();
@@ -611,42 +511,6 @@ public final class SpringJdbcEngine implements JdbcEngine {
         String sql = this.insertParser.batchInsert(columnEngine.getTableName(), columnAliasMap, records.size());
         printPrecompileSqlAndArgs(sql, null, null, null);
         return this.jdbcTemplate.update(sql, new BatchCollectionRecordPreparedStatementSetter(records, columnAliasMap));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Object[] args, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.updateParser.updateByPrimaryKey(model.getTableName(), model.getPrimaryKeyName(), model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
-        return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Object[] args, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.updateParser.updateByPrimaryKey(tableName, model.getPrimaryKeyName(), model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
-        return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Collection<?> args, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.updateParser.updateByPrimaryKey(model.getTableName(), model.getPrimaryKeyName(), model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
-        return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateArgsByPrimaryKey(Object keyValue, Collection<?> args, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        String sql = this.updateParser.updateByPrimaryKey(tableName, model.getPrimaryKeyName(), model.getColumnAliasMap());
-        printPrecompileSqlAndArgs(sql, null, args, keyValue);
-        return this.jdbcTemplate.update(sql, new AppendCollectionArgumentPreparedStatementSetter(args, keyValue));
     }
 
     @Override
@@ -929,46 +793,6 @@ public final class SpringJdbcEngine implements JdbcEngine {
         List<Object> args = data.getArgs();
         printPrecompileSqlAndArgs(sql, null, args, null);
         return this.jdbcTemplate.update(sql, new CollectionArgumentPreparedStatementSetter(args));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateOrInsertArgs(Object[] batchArgs, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.updateOrInsertParser.updateOrInsert(model.getTableName(), columnAliasMap, batchArgs.length);
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateOrInsertArgs(Object[] batchArgs, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.updateOrInsertParser.updateOrInsert(tableName, columnAliasMap, batchArgs.length);
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateOrInsertArgs(Collection<?> batchArgs, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.updateOrInsertParser.updateOrInsert(model.getTableName(), columnAliasMap, batchArgs.size());
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends Model> int updateOrInsertArgs(Collection<?> batchArgs, String tableName, Class<T> modelClass) {
-        Model model = newModel(modelClass);
-        Map<String, String> columnAliasMap = model.getColumnAliasMap();
-        String sql = this.updateOrInsertParser.updateOrInsert(tableName, columnAliasMap, batchArgs.size());
-        printPrecompileSqlAndArgs(sql, null, null, null);
-        return this.jdbcTemplate.update(sql, new BatchArgumentPreparedStatementSetter(batchArgs, columnAliasMap.size()));
     }
 
     @Override
